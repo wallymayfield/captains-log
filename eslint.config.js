@@ -44,5 +44,16 @@ export default [
       "react/prop-types": "off",
     },
   },
+  {
+    // react-three-fiber introduces dozens of three.js JSX intrinsics
+    // and props that the react plugin doesn't recognize.
+    files: [
+      "src/components/Schematic.tsx",
+      "src/components/schematic/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "react/no-unknown-property": "off",
+    },
+  },
   prettier,
 ];

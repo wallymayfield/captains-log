@@ -728,141 +728,82 @@ body,
   }
 }
 
-.lcars-schematic__svg {
-  width: min(72%, 580px);
-  height: auto;
+/* Three.js canvas hosting the rotating ship. Fills the stage. */
+.lcars-schematic__canvas {
+  position: absolute !important;
+  inset: 0;
   z-index: 2;
-  overflow: visible;
+  cursor: grab;
 }
-.lcars-schematic__svg ellipse,
-.lcars-schematic__svg line,
-.lcars-schematic__svg circle {
+.lcars-schematic__canvas:active {
+  cursor: grabbing;
+}
+.lcars-msd__outline {
   fill: none;
-  stroke: var(--lcars-orange);
-  stroke-width: 1.5;
+  stroke: var(--lcars-text-body);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
 }
-
-.lcars-schematic__ring {
-  stroke: var(--lcars-orange);
-  stroke-width: 0.6;
-  opacity: 0.18;
-}
-
-.lcars-schematic__sweep {
-  stroke: var(--lcars-peach);
-  stroke-width: 1;
-  opacity: 0.55;
-  transform-origin: 0 0;
-  animation: lcars-schematic-sweep 5s linear infinite;
-}
-@keyframes lcars-schematic-sweep {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.lcars-schematic__hull {
-  transform-origin: 0 0;
-  animation: lcars-schematic-spin 90s linear infinite;
-}
-@keyframes lcars-schematic-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.lcars-schematic__cap {
-  fill: var(--lcars-blue);
-  stroke: none;
-  filter: drop-shadow(0 0 6px var(--lcars-blue));
-  animation: lcars-schematic-pulse 1.4s ease-in-out infinite;
-}
-.lcars-schematic__cap:nth-of-type(2) {
-  animation-delay: 0.7s;
-}
-@keyframes lcars-schematic-pulse {
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.lcars-schematic__deflector {
-  fill: var(--lcars-orange);
-  stroke: none;
-  filter: drop-shadow(0 0 6px rgba(255, 153, 51, 0.7));
-  animation: lcars-schematic-deflector 3s ease-in-out infinite;
-}
-@keyframes lcars-schematic-deflector {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.lcars-schematic__bridge {
-  fill: var(--lcars-peach);
-  stroke: none;
+.lcars-msd__detail {
+  fill: none;
+  stroke: var(--lcars-blue);
+  stroke-width: 0.7;
   opacity: 0.85;
 }
-
-.lcars-schematic__readout {
-  position: absolute;
-  z-index: 3;
-  font-family: "Antonio", Impact, sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-transform: uppercase;
-  pointer-events: none;
+.lcars-msd__phaser {
+  fill: none;
+  stroke: var(--lcars-peach);
+  stroke-width: 1.4;
+  opacity: 0.85;
 }
-.lcars-schematic__readout-label {
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  color: var(--lcars-orange);
-  opacity: 0.75;
+.lcars-msd__panel {
+  fill: var(--lcars-blue);
+  stroke: none;
+  opacity: 0.7;
 }
-.lcars-schematic__readout-value {
-  font-size: 16px;
-  letter-spacing: 0.1em;
-  color: var(--lcars-text-body);
+.lcars-msd__window {
+  fill: var(--lcars-blue);
+  stroke: none;
+  opacity: 0.95;
 }
-.lcars-schematic__readout--tl {
-  top: 28px;
-  left: 32px;
+.lcars-msd__coil {
+  fill: var(--lcars-blue);
+  stroke: none;
+  opacity: 0.9;
 }
-.lcars-schematic__readout--tr {
-  top: 28px;
-  right: 32px;
-  align-items: flex-end;
+.lcars-msd__bussard {
+  fill: var(--lcars-red);
+  stroke: var(--lcars-red);
+  stroke-width: 0.8;
+  opacity: 0.85;
 }
-.lcars-schematic__readout--bl {
-  bottom: 28px;
-  left: 32px;
+.lcars-msd__bussard-cell {
+  fill: var(--lcars-orange);
+  stroke: none;
+  opacity: 0.95;
 }
-.lcars-schematic__readout--br {
-  bottom: 28px;
-  right: 32px;
-  align-items: flex-end;
+.lcars-msd__impulse {
+  fill: var(--lcars-orange);
+  stroke: none;
+  opacity: 0.9;
+}
+.lcars-msd__deflector {
+  fill: var(--lcars-orange);
+  stroke: var(--lcars-orange);
+  stroke-width: 1;
+}
+.lcars-msd__deflector-inner {
+  fill: var(--lcars-peach);
+  stroke: none;
+  opacity: 0.9;
+}
+.lcars-msd__bay {
+  fill: none;
+  stroke: var(--lcars-text-body);
+  stroke-width: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lcars-schematic__hull,
-  .lcars-schematic__sweep,
-  .lcars-schematic__cap,
-  .lcars-schematic__deflector,
   .lcars-schematic__star {
     animation: none;
   }

@@ -179,7 +179,7 @@ export function App() {
 
   const stageContent =
     route === "schematic" ? (
-      <Schematic date={now} />
+      <Schematic />
     ) : viewMode === "preview" ? (
       <Preview doc={doc} />
     ) : (
