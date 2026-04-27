@@ -72,12 +72,17 @@ export function App() {
 
   const confirmDiscard = useCallback(async (): Promise<boolean> => {
     if (!dirty) return true;
-    return await ask(DISCARD_PROMPT, {
-      title: "Captain's Log",
-      kind: "warning",
-      okLabel: "Discard",
-      cancelLabel: "Keep editing",
-    });
+    setAlert(true);
+    try {
+      return await ask(DISCARD_PROMPT, {
+        title: "Captain's Log",
+        kind: "warning",
+        okLabel: "Discard",
+        cancelLabel: "Keep editing",
+      });
+    } finally {
+      setAlert(false);
+    }
   }, [dirty]);
 
   const handleNew = useCallback(async () => {
@@ -155,10 +160,6 @@ export function App() {
     setSettingsOpen(true);
   }, []);
 
-  const toggleAlert = useCallback(() => {
-    setAlert((a) => !a);
-  }, []);
-
   useShortcuts({
     onNew: handleNew,
     onOpen: handleOpen,
@@ -166,7 +167,6 @@ export function App() {
     onSaveAs: handleSaveAs,
     onTogglePreview: toggleViewMode,
     onOpenSettings: openSettings,
-    onToggleAlert: toggleAlert,
   });
 
   const stageContent =
@@ -210,14 +210,12 @@ export function App() {
           <LeftRail
             viewMode={viewMode}
             status={status}
-            alert={alert}
             onToggleViewMode={toggleViewMode}
             onNew={handleNew}
             onOpen={handleOpen}
             onSave={handleSave}
             onSaveAs={handleSaveAs}
             onOpenSettings={openSettings}
-            onToggleAlert={toggleAlert}
           />
         }
         stage={
@@ -237,8 +235,6 @@ export function App() {
             date={now}
             fileName={fileName}
             dirty={dirty}
-            alert={alert}
-            onToggleAlert={toggleAlert}
           />
         }
       />

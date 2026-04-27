@@ -103,8 +103,8 @@ export function SettingsPanel({
         </div>
 
         <p className="lcars-settings__note">
-          Tip: click the LCARS&nbsp;47-A badge in the bottom bar (or
-          press Ctrl/Cmd + Shift + A) for red alert.
+          Tip: the ship sounds red alert if you try to discard
+          unsaved changes.
         </p>
 
         <footer className="lcars-settings__footer">

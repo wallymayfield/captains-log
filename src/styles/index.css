@@ -66,7 +66,11 @@ body,
 .lcars-shell {
   display: grid;
   grid-template-columns: var(--rail-width) 1fr;
-  grid-template-rows: var(--top-height) 1fr var(--bottom-height);
+  /* minmax(0, 1fr) lets the middle row stay capped at the viewport
+     height even when the stage holds a long document — without it,
+     the row's implicit min-height: min-content pushes the bars off
+     screen as the editor grows. */
+  grid-template-rows: var(--top-height) minmax(0, 1fr) var(--bottom-height);
   gap: var(--gap);
   height: 100vh;
   width: 100vw;
@@ -250,13 +254,11 @@ body,
 }
 
 /* Interactive bar — bar rendered as a <button>. Visual identical, plus
-   hover/active/focus states. Reset native button look. */
+   hover/active/focus states. Reset native button look but keep the
+   font properties from .lcars-bar so static and button bars match. */
 .lcars-bar--interactive {
   appearance: none;
   border: 0;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
   text-align: left;
   width: 100%;
   cursor: pointer;
@@ -404,19 +406,38 @@ body,
 .lcars-topbar,
 .lcars-bottombar {
   height: 100%;
+  /* Right end is fully rounded — push content past the curve so it
+     doesn't get clipped. */
+  padding-right: 36px;
 }
 
-.lcars-topbar__stardate,
+/* Right-aligned cluster on the top and bottom bars (stardate+status,
+   real date+badge). Inline, baseline-aligned, equal spacing. */
+.lcars-topbar__meta,
+.lcars-bottombar__meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.lcars-topbar__field,
 .lcars-bottombar__stat {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
 }
-.lcars-topbar__stardate-label,
+.lcars-topbar__field-label,
 .lcars-bottombar__stat-label {
   opacity: 0.7;
   font-weight: 400;
   font-size: 12px;
+}
+
+.lcars-bottombar__badge {
+  opacity: 0.7;
+  font-size: 12px;
+  letter-spacing: 0.08em;
 }
 
 .lcars-bottombar__stats {
@@ -449,28 +470,7 @@ body,
   flex: 0 0 auto;
 }
 .lcars-bottombar__date {
-  margin-left: auto;
   opacity: 0.8;
-}
-
-/* The cosmetic LCARS 47-A badge is also the red-alert easter egg. */
-.lcars-bottombar__alert-trigger {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: var(--lcars-bg);
-  font: inherit;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 3px;
-}
-.lcars-bottombar__alert-trigger:hover {
-  background: rgba(0, 0, 0, 0.12);
-}
-.lcars-bottombar__alert-trigger:focus-visible {
-  outline: 2px solid var(--lcars-bg);
-  outline-offset: 2px;
 }
 
 /* ----------------------------------------------------------
@@ -823,7 +823,10 @@ body,
   line-height: 1.6;
   resize: none;
   field-sizing: content;
-  min-height: 60vh;
+  /* Flex-grow fills whatever space is left in the editor when the
+     document is short; field-sizing makes it grow past that as the
+     user types, which then triggers the stage's overflow scroll. */
+  flex: 1 0 auto;
   padding: 4px 0 24px;
 }
 
