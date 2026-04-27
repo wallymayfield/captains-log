@@ -1,39 +1,39 @@
-import type { CSSProperties } from "react";
+import { Bar, Pill } from "@/components/primitives";
+import type { LcarsColor } from "@/lib/lcars-colors";
+import { navigate } from "@/lib/use-hash-route";
 
 type RailItem = {
   label: string;
-  id: string;
-  color: string;
+  color: LcarsColor;
   filler?: boolean;
 };
 
 const ITEMS: RailItem[] = [
-  { label: "NEW", id: "01-2847", color: "var(--lcars-orange)" },
-  { label: "OPEN", id: "02-3361", color: "var(--lcars-peach)" },
-  { label: "SAVE", id: "03-4477", color: "var(--lcars-peach)" },
-  { label: "EXPORT", id: "04-5102", color: "var(--lcars-tan)" },
-  { label: "", id: "05-6630", color: "var(--lcars-pink)", filler: true },
-  { label: "STATUS", id: "06-7715", color: "var(--lcars-violet)" },
+  { label: "NEW", color: "orange" },
+  { label: "OPEN", color: "peach" },
+  { label: "SAVE", color: "peach" },
+  { label: "EXPORT", color: "tan" },
+  { label: "", color: "pink", filler: true },
+  { label: "STATUS", color: "violet" },
 ];
 
 export function LeftRail() {
   return (
     <div className="lcars-rail" role="navigation" aria-label="Primary">
-      {ITEMS.map((item) => {
-        const style = { "--bar-color": item.color } as CSSProperties;
-        return (
-          <div
-            key={item.id}
-            className={
-              "lcars-rail__bar" + (item.filler ? " lcars-rail__bar--filler" : "")
-            }
-            style={style}
-          >
-            <span>{item.label}</span>
-            <span className="lcars-rail__bar-id">{item.id}</span>
-          </div>
-        );
-      })}
+      {ITEMS.map((item, i) =>
+        item.filler ? (
+          <Bar key={i} color={item.color} grow showId={false} />
+        ) : (
+          <Bar key={i} label={item.label} color={item.color} />
+        ),
+      )}
+      {import.meta.env.DEV ? (
+        <Pill
+          label="PRIMITIVES"
+          color="blue"
+          onClick={() => navigate("showcase")}
+        />
+      ) : null}
     </div>
   );
 }

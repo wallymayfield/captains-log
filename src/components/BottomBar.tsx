@@ -1,3 +1,5 @@
+import { Bar } from "@/components/primitives";
+
 type BottomBarProps = {
   words: number;
   characters: number;
@@ -19,7 +21,12 @@ export function BottomBar({
   date,
 }: BottomBarProps) {
   return (
-    <div className="lcars-bar lcars-bottombar">
+    <Bar
+      color="tan"
+      roundRight
+      refId="LCARS 47-A"
+      className="lcars-bottombar"
+    >
       <div className="lcars-bottombar__stats">
         <span className="lcars-bottombar__stat">
           <span className="lcars-bottombar__stat-label">WORDS</span>
@@ -35,7 +42,6 @@ export function BottomBar({
         </span>
       </div>
       <span className="lcars-bottombar__date">{formatDate(date)}</span>
-      <span className="lcars-bar__id">LCARS 47-A</span>
-    </div>
+    </Bar>
   );
 }

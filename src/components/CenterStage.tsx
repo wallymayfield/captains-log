@@ -9,7 +9,7 @@ export function CenterStage({ children }: CenterStageProps) {
     return <main className="lcars-stage">{children}</main>;
   }
   return (
-    <main className="lcars-stage">
+    <main className="lcars-stage lcars-stage--empty">
       <span className="lcars-stage__placeholder">Stand by for input</span>
     </main>
   );
