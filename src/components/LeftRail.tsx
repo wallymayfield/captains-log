@@ -17,7 +17,14 @@ const ITEMS: RailItem[] = [
   { label: "STATUS", color: "violet" },
 ];
 
-export function LeftRail() {
+export type ViewMode = "write" | "preview";
+
+type LeftRailProps = {
+  viewMode: ViewMode;
+  onToggleViewMode: () => void;
+};
+
+export function LeftRail({ viewMode, onToggleViewMode }: LeftRailProps) {
   return (
     <div className="lcars-rail" role="navigation" aria-label="Primary">
       {ITEMS.map((item, i) =>
@@ -27,6 +34,14 @@ export function LeftRail() {
           <Bar key={i} label={item.label} color={item.color} />
         ),
       )}
+      <Pill
+        label={viewMode === "preview" ? "WRITE" : "PREVIEW"}
+        color={viewMode === "preview" ? "orange" : "violet"}
+        onClick={onToggleViewMode}
+        ariaLabel={
+          viewMode === "preview" ? "Back to editor" : "Show markdown preview"
+        }
+      />
       {import.meta.env.DEV ? (
         <Pill
           label="PRIMITIVES"
