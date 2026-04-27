@@ -13,7 +13,16 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-      globals: { window: "readonly", document: "readonly", console: "readonly" },
+      globals: {
+        window: "readonly",
+        document: "readonly",
+        console: "readonly",
+        KeyboardEvent: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+      },
     },
     plugins: {
       "@typescript-eslint": tsPlugin,

@@ -422,7 +422,31 @@ body,
 .lcars-bottombar__stats {
   display: flex;
   gap: 22px;
-  flex: 1;
+}
+.lcars-bottombar__file {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 22px;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+.lcars-bottombar__filename {
+  font-family: "Antonio", Impact, sans-serif;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}
+.lcars-bottombar__dirty {
+  color: var(--lcars-bg);
+  font-size: 12px;
+  line-height: 1;
+  flex: 0 0 auto;
 }
 .lcars-bottombar__date {
   margin-left: auto;

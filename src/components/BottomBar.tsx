@@ -5,6 +5,8 @@ type BottomBarProps = {
   characters: number;
   readingMinutes: number;
   date: Date;
+  fileName: string | null;
+  dirty: boolean;
 };
 
 function formatDate(date: Date): string {
@@ -19,6 +21,8 @@ export function BottomBar({
   characters,
   readingMinutes,
   date,
+  fileName,
+  dirty,
 }: BottomBarProps) {
   return (
     <Bar
@@ -41,6 +45,22 @@ export function BottomBar({
           <span>{readingMinutes} MIN</span>
         </span>
       </div>
+
+      <div className="lcars-bottombar__file">
+        {dirty ? (
+          <span
+            className="lcars-bottombar__dirty"
+            aria-label="Unsaved changes"
+            title="Unsaved changes"
+          >
+            ●
+          </span>
+        ) : null}
+        {fileName ? (
+          <span className="lcars-bottombar__filename">{fileName}</span>
+        ) : null}
+      </div>
+
       <span className="lcars-bottombar__date">{formatDate(date)}</span>
     </Bar>
   );

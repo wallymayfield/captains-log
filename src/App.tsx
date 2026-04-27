@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { ask } from "@tauri-apps/plugin-dialog";
 import { Shell } from "@/components/Shell";
 import { Elbow } from "@/components/primitives";
-import { LeftRail, type ViewMode } from "@/components/LeftRail";
+import { LeftRail, type Status, type ViewMode } from "@/components/LeftRail";
 import { TopBar } from "@/components/TopBar";
 import { BottomBar } from "@/components/BottomBar";
 import { CenterStage } from "@/components/CenterStage";
@@ -10,63 +11,114 @@ import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { useHashRoute } from "@/lib/use-hash-route";
-import { newDoc, readingMinutes, wordCount } from "@/lib/document";
+import { useTicker } from "@/lib/use-ticker";
+import { useShortcuts } from "@/lib/use-shortcuts";
+import {
+  basename,
+  docsEqual,
+  newDoc,
+  readingMinutes,
+  wordCount,
+  type Doc,
+} from "@/lib/document";
 import { pickAndOpen, pickAndSave, writeToPath } from "@/lib/file-ops";
 
+const DISCARD_PROMPT =
+  "You have unsaved changes. Discard them and continue?";
+
 export function App() {
-  const [doc, setDoc] = useState(() => newDoc());
+  const initial = newDoc();
+  const [doc, setDoc] = useState<Doc>(initial);
+  const [savedDoc, setSavedDoc] = useState<Doc>(initial);
   const [path, setPath] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("write");
   const [error, setError] = useState<string | null>(null);
-  const route = useHashRoute();
-  const now = new Date();
 
+  const route = useHashRoute();
+  const now = useTicker(60_000);
+
+  const dirty = !docsEqual(doc, savedDoc);
   const words = wordCount(doc.body);
   const chars = doc.body.length;
   const reading = readingMinutes(words);
   const docTitle = doc.title.trim() || "UNTITLED LOG ENTRY";
 
-  const handleNew = () => {
-    setDoc(newDoc());
+  const confirmDiscard = useCallback(async (): Promise<boolean> => {
+    if (!dirty) return true;
+    return await ask(DISCARD_PROMPT, {
+      title: "Captain's Log",
+      kind: "warning",
+      okLabel: "Discard",
+      cancelLabel: "Keep editing",
+    });
+  }, [dirty]);
+
+  const handleNew = useCallback(async () => {
+    if (!(await confirmDiscard())) return;
+    const fresh = newDoc();
+    setDoc(fresh);
+    setSavedDoc(fresh);
     setPath(null);
     setError(null);
-  };
+  }, [confirmDiscard]);
 
-  const handleOpen = async () => {
+  const handleOpen = useCallback(async () => {
+    if (!(await confirmDiscard())) return;
     try {
       const result = await pickAndOpen();
       if (!result) return;
       setDoc(result.doc);
+      setSavedDoc(result.doc);
       setPath(result.path);
       setError(null);
     } catch (e) {
       setError(messageOf(e));
     }
-  };
+  }, [confirmDiscard]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       if (!path) {
         const newPath = await pickAndSave(doc);
-        if (newPath) setPath(newPath);
+        if (newPath) {
+          setPath(newPath);
+          setSavedDoc(doc);
+        }
       } else {
         await writeToPath(doc, path);
+        setSavedDoc(doc);
       }
       setError(null);
     } catch (e) {
       setError(messageOf(e));
     }
-  };
+  }, [doc, path]);
 
-  const handleSaveAs = async () => {
+  const handleSaveAs = useCallback(async () => {
     try {
       const newPath = await pickAndSave(doc, path ?? undefined);
-      if (newPath) setPath(newPath);
+      if (newPath) {
+        setPath(newPath);
+        setSavedDoc(doc);
+      }
       setError(null);
     } catch (e) {
       setError(messageOf(e));
     }
-  };
+  }, [doc, path]);
+
+  const toggleViewMode = useCallback(
+    () => setViewMode((m) => (m === "write" ? "preview" : "write")),
+    [],
+  );
+
+  useShortcuts({
+    onNew: handleNew,
+    onOpen: handleOpen,
+    onSave: handleSave,
+    onSaveAs: handleSaveAs,
+    onTogglePreview: toggleViewMode,
+  });
 
   const stageContent =
     route === "showcase" ? (
@@ -77,12 +129,16 @@ export function App() {
       <Editor doc={doc} onChange={setDoc} />
     );
 
-  const status =
+  const status: Status =
     route === "showcase"
       ? "STANDBY"
       : viewMode === "preview"
         ? "PREVIEW"
-        : "STANDBY";
+        : dirty
+          ? "MODIFIED"
+          : "READY";
+
+  const fileName = path ? basename(path) : null;
 
   return (
     <Shell
@@ -92,7 +148,7 @@ export function App() {
           documentTitle={
             route === "showcase"
               ? "PRIMITIVES SHOWCASE"
-              : docTitle.toUpperCase()
+              : `${dirty ? "• " : ""}${docTitle.toUpperCase()}`
           }
           status={status}
           date={now}
@@ -101,9 +157,8 @@ export function App() {
       rail={
         <LeftRail
           viewMode={viewMode}
-          onToggleViewMode={() =>
-            setViewMode((m) => (m === "write" ? "preview" : "write"))
-          }
+          status={status}
+          onToggleViewMode={toggleViewMode}
           onNew={handleNew}
           onOpen={handleOpen}
           onSave={handleSave}
@@ -125,6 +180,8 @@ export function App() {
           characters={chars}
           readingMinutes={reading}
           date={now}
+          fileName={fileName}
+          dirty={dirty}
         />
       }
     />

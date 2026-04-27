@@ -31,3 +31,17 @@ export function wordCount(text: string): number {
 export function readingMinutes(words: number): number {
   return words === 0 ? 0 : Math.max(1, Math.ceil(words / 225));
 }
+
+export function docsEqual(a: Doc, b: Doc): boolean {
+  return (
+    a.title === b.title &&
+    a.date === b.date &&
+    a.excerpt === b.excerpt &&
+    a.body === b.body
+  );
+}
+
+export function basename(p: string): string {
+  const parts = p.split(/[\\/]/);
+  return parts[parts.length - 1] ?? p;
+}

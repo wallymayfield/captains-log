@@ -2,9 +2,11 @@ import { Bar, Pill } from "@/components/primitives";
 import { navigate } from "@/lib/use-hash-route";
 
 export type ViewMode = "write" | "preview";
+export type Status = "READY" | "MODIFIED" | "PREVIEW" | "STANDBY";
 
 type LeftRailProps = {
   viewMode: ViewMode;
+  status: Status;
   onToggleViewMode: () => void;
   onNew: () => void;
   onOpen: () => void;
@@ -12,8 +14,16 @@ type LeftRailProps = {
   onSaveAs: () => void;
 };
 
+const STATUS_COLOR: Record<Status, "violet" | "red" | "blue" | "peach"> = {
+  READY: "violet",
+  MODIFIED: "red",
+  PREVIEW: "blue",
+  STANDBY: "peach",
+};
+
 export function LeftRail({
   viewMode,
+  status,
   onToggleViewMode,
   onNew,
   onOpen,
@@ -27,7 +37,7 @@ export function LeftRail({
       <Bar label="SAVE" color="peach" onClick={onSave} />
       <Bar label="SAVE AS" color="tan" onClick={onSaveAs} />
       <Bar color="pink" grow showId={false} />
-      <Bar label="STATUS" color="violet" />
+      <Bar label={status} color={STATUS_COLOR[status]} />
       <Pill
         label={viewMode === "preview" ? "WRITE" : "PREVIEW"}
         color={viewMode === "preview" ? "orange" : "violet"}
