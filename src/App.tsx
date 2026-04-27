@@ -68,7 +68,7 @@ export function App() {
   const words = wordCount(doc.body);
   const chars = doc.body.length;
   const reading = readingMinutes(words);
-  const docTitle = doc.title.trim() || "UNTITLED LOG ENTRY";
+  const docTitle = doc.title.trim() || "MISSION DESIGNATION PENDING";
 
   const confirmDiscard = useCallback(async (): Promise<boolean> => {
     if (!dirty) return true;

@@ -13,7 +13,7 @@ export function Editor({ doc, onChange }: EditorProps) {
         className="lcars-editor__title"
         value={doc.title}
         onChange={(e) => onChange({ ...doc, title: e.target.value })}
-        placeholder="Untitled log entry"
+        placeholder="Mission designation pending"
         spellCheck
         aria-label="Title"
       />
@@ -35,7 +35,7 @@ export function Editor({ doc, onChange }: EditorProps) {
             className="lcars-editor__excerpt"
             value={doc.excerpt}
             onChange={(e) => onChange({ ...doc, excerpt: e.target.value })}
-            placeholder="Short blurb shown in feeds"
+            placeholder="Brief for subspace dispatch"
             rows={2}
             spellCheck
           />
@@ -46,7 +46,7 @@ export function Editor({ doc, onChange }: EditorProps) {
         className="lcars-editor__body"
         value={doc.body}
         onChange={(e) => onChange({ ...doc, body: e.target.value })}
-        placeholder="Begin entry…"
+        placeholder="Captain's log, supplemental…"
         spellCheck
         aria-label="Body"
       />
