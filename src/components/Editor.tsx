@@ -1,4 +1,6 @@
+import { useState } from "react";
 import type { Doc } from "@/lib/document";
+import { DatePicker } from "./DatePicker";
 
 type EditorProps = {
   doc: Doc;
@@ -6,6 +8,8 @@ type EditorProps = {
 };
 
 export function Editor({ doc, onChange }: EditorProps) {
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+
   return (
     <div className="lcars-editor">
       <input
@@ -19,15 +23,16 @@ export function Editor({ doc, onChange }: EditorProps) {
       />
 
       <div className="lcars-editor__meta">
-        <label className="lcars-editor__field">
+        <div className="lcars-editor__field">
           <span className="lcars-editor__field-label">Date</span>
-          <input
-            type="date"
+          <button
+            type="button"
             className="lcars-editor__date"
-            value={doc.date}
-            onChange={(e) => onChange({ ...doc, date: e.target.value })}
-          />
-        </label>
+            onClick={() => setDatePickerOpen(true)}
+          >
+            {doc.date}
+          </button>
+        </div>
 
         <label className="lcars-editor__field lcars-editor__field--grow">
           <span className="lcars-editor__field-label">Excerpt</span>
@@ -49,6 +54,13 @@ export function Editor({ doc, onChange }: EditorProps) {
         placeholder="Captain's log, supplemental…"
         spellCheck
         aria-label="Body"
+      />
+
+      <DatePicker
+        open={datePickerOpen}
+        value={doc.date}
+        onChange={(d) => onChange({ ...doc, date: d })}
+        onClose={() => setDatePickerOpen(false)}
       />
     </div>
   );

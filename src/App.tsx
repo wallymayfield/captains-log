@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { ask } from "@tauri-apps/plugin-dialog";
 import { Shell } from "@/components/Shell";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Elbow } from "@/components/primitives";
 import { LeftRail, type Status, type ViewMode } from "@/components/LeftRail";
 import { TopBar } from "@/components/TopBar";
@@ -34,6 +34,10 @@ import {
 const DISCARD_PROMPT =
   "You have unsaved changes. Discard them and continue?";
 
+type ConfirmRequest = {
+  resolve: (v: boolean) => void;
+};
+
 export function App() {
   const initial = newDoc();
   const [doc, setDoc] = useState<Doc>(initial);
@@ -44,6 +48,7 @@ export function App() {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [alert, setAlert] = useState(false);
+  const [confirmReq, setConfirmReq] = useState<ConfirmRequest | null>(null);
 
   const route = useHashRoute();
   const now = useTicker(60_000);
@@ -74,16 +79,18 @@ export function App() {
     if (!dirty) return true;
     setAlert(true);
     try {
-      return await ask(DISCARD_PROMPT, {
-        title: "Captain's Log",
-        kind: "warning",
-        okLabel: "Discard",
-        cancelLabel: "Keep editing",
+      return await new Promise<boolean>((resolve) => {
+        setConfirmReq({ resolve });
       });
     } finally {
       setAlert(false);
     }
   }, [dirty]);
+
+  const resolveConfirm = (answer: boolean) => {
+    confirmReq?.resolve(answer);
+    setConfirmReq(null);
+  };
 
   const handleNew = useCallback(async () => {
     play("select");
@@ -243,6 +250,16 @@ export function App() {
         settings={settings}
         onChange={setSettings}
         onClose={() => setSettingsOpen(false)}
+      />
+      <ConfirmDialog
+        open={confirmReq !== null}
+        title="Captain's Log"
+        message={DISCARD_PROMPT}
+        okLabel="Discard"
+        cancelLabel="Keep editing"
+        destructive
+        onConfirm={() => resolveConfirm(true)}
+        onCancel={() => resolveConfirm(false)}
       />
     </>
   );

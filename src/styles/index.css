@@ -523,10 +523,10 @@ body,
 }
 
 /* ----------------------------------------------------------
-   Settings modal — sound preferences only. LCARS frame.
+   Modal — shared LCARS frame for Settings, Confirm, DatePicker.
    ---------------------------------------------------------- */
 
-.lcars-settings__backdrop {
+.lcars-modal__backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
@@ -535,7 +535,7 @@ body,
   justify-content: center;
   z-index: 200;
 }
-.lcars-settings {
+.lcars-modal {
   width: min(520px, 92vw);
   background: var(--lcars-bg);
   color: var(--lcars-text);
@@ -547,23 +547,51 @@ body,
   flex-direction: column;
   gap: 16px;
 }
-.lcars-settings__header {
+.lcars-modal__header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 153, 51, 0.25);
   padding-bottom: 10px;
 }
-.lcars-settings__title {
+.lcars-modal__title {
   font-size: 22px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
-.lcars-settings__id {
+.lcars-modal__id {
   font-size: 11px;
   letter-spacing: 0.08em;
   opacity: 0.7;
 }
+.lcars-modal__message {
+  margin: 0;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--lcars-text-body);
+}
+.lcars-modal__note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--lcars-text-body);
+  opacity: 0.65;
+  font-family: "Newsreader", Georgia, serif;
+  font-style: italic;
+}
+.lcars-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 153, 51, 0.25);
+  padding-top: 10px;
+}
+.lcars-modal__footer--split {
+  justify-content: space-between;
+}
+
+/* Settings-specific row layout. */
 .lcars-settings__row {
   display: flex;
   align-items: center;
@@ -587,20 +615,73 @@ body,
   flex: 1 1 auto;
   accent-color: var(--lcars-orange);
 }
-.lcars-settings__note {
-  margin: 4px 0 0;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  color: var(--lcars-text-body);
-  opacity: 0.65;
-  font-family: "Newsreader", Georgia, serif;
-  font-style: italic;
-}
-.lcars-settings__footer {
+
+/* ----------------------------------------------------------
+   Date picker — calendar grid in LCARS chrome.
+   ---------------------------------------------------------- */
+
+.lcars-datepicker__nav {
   display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid rgba(255, 153, 51, 0.25);
-  padding-top: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.lcars-datepicker__viewlabel {
+  font-size: 18px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lcars-text-body);
+  flex: 1 1 auto;
+  text-align: center;
+}
+.lcars-datepicker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  /* Header row auto-sizes; the six day rows are fixed so the modal
+     stays the same height across months with different week counts. */
+  grid-template-rows: auto repeat(6, 36px);
+  gap: 4px;
+}
+.lcars-datepicker__dayheader {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--lcars-peach);
+  text-align: center;
+  padding: 4px 0;
+}
+.lcars-datepicker__empty {
+  visibility: hidden;
+}
+.lcars-datepicker__day {
+  appearance: none;
+  border: 1px solid transparent;
+  background: rgba(255, 153, 51, 0.06);
+  color: var(--lcars-text-body);
+  font-family: "Antonio", Impact, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 10px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 80ms linear;
+}
+.lcars-datepicker__day:hover {
+  background: rgba(255, 153, 51, 0.18);
+}
+.lcars-datepicker__day:focus-visible {
+  outline: 2px solid var(--lcars-orange);
+  outline-offset: 1px;
+}
+.lcars-datepicker__day--today {
+  border-color: var(--lcars-peach);
+}
+.lcars-datepicker__day--selected {
+  background: var(--lcars-orange);
+  color: var(--lcars-bg);
+  font-weight: 500;
+}
+.lcars-datepicker__day--selected:hover {
+  background: var(--lcars-orange);
 }
 
 /* ----------------------------------------------------------
@@ -799,12 +880,26 @@ body,
 }
 
 .lcars-editor__date {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(255, 153, 51, 0.35);
+  color: var(--lcars-text-body);
   font-family: "Antonio", Impact, sans-serif;
   font-size: 16px;
   letter-spacing: 0.04em;
-  color-scheme: dark;
-  padding: 2px 0;
-  width: auto;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  width: max-content;
+  transition: border-color 80ms linear;
+}
+.lcars-editor__date:hover {
+  border-color: var(--lcars-orange);
+}
+.lcars-editor__date:focus-visible {
+  outline: 2px solid var(--lcars-orange);
+  outline-offset: 1px;
 }
 
 .lcars-editor__excerpt {
