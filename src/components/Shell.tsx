@@ -7,6 +7,7 @@ type ShellProps = {
   stage: ReactNode;
   bottomLeft: ReactNode;
   bottomBar: ReactNode;
+  alert?: boolean;
 };
 
 export function Shell({
@@ -16,9 +17,11 @@ export function Shell({
   stage,
   bottomLeft,
   bottomBar,
+  alert,
 }: ShellProps) {
+  const cls = "lcars-shell" + (alert ? " lcars-shell--alert" : "");
   return (
-    <div className="lcars-shell">
+    <div className={cls}>
       <div className="lcars-shell__elbow-tl">{topLeft}</div>
       <div className="lcars-shell__topbar">{topBar}</div>
       <div className="lcars-shell__rail">{rail}</div>

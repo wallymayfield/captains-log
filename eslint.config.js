@@ -22,6 +22,12 @@ export default [
         clearInterval: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
+        AudioContext: "readonly",
+        OscillatorNode: "readonly",
+        GainNode: "readonly",
+        localStorage: "readonly",
+        Audio: "readonly",
+        HTMLAudioElement: "readonly",
       },
     },
     plugins: {

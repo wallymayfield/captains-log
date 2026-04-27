@@ -7,6 +7,8 @@ type BottomBarProps = {
   date: Date;
   fileName: string | null;
   dirty: boolean;
+  alert: boolean;
+  onToggleAlert: () => void;
 };
 
 function formatDate(date: Date): string {
@@ -23,14 +25,11 @@ export function BottomBar({
   date,
   fileName,
   dirty,
+  alert,
+  onToggleAlert,
 }: BottomBarProps) {
   return (
-    <Bar
-      color="tan"
-      roundRight
-      refId="LCARS 47-A"
-      className="lcars-bottombar"
-    >
+    <Bar color="tan" roundRight className="lcars-bottombar">
       <div className="lcars-bottombar__stats">
         <span className="lcars-bottombar__stat">
           <span className="lcars-bottombar__stat-label">WORDS</span>
@@ -62,6 +61,15 @@ export function BottomBar({
       </div>
 
       <span className="lcars-bottombar__date">{formatDate(date)}</span>
+      <button
+        type="button"
+        className="lcars-bar__id lcars-bottombar__alert-trigger"
+        onClick={onToggleAlert}
+        aria-label={alert ? "Stand down from red alert" : "Sound red alert"}
+        title={alert ? "Stand down" : "Red alert"}
+      >
+        {alert ? "ALERT — STAND DOWN" : "LCARS 47-A"}
+      </button>
     </Bar>
   );
 }

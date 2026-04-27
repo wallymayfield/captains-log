@@ -2,16 +2,19 @@ import { Bar, Pill } from "@/components/primitives";
 import { navigate } from "@/lib/use-hash-route";
 
 export type ViewMode = "write" | "preview";
-export type Status = "READY" | "MODIFIED" | "PREVIEW" | "STANDBY";
+export type Status = "READY" | "MODIFIED" | "PREVIEW" | "STANDBY" | "ALERT";
 
 type LeftRailProps = {
   viewMode: ViewMode;
   status: Status;
+  alert: boolean;
   onToggleViewMode: () => void;
   onNew: () => void;
   onOpen: () => void;
   onSave: () => void;
   onSaveAs: () => void;
+  onOpenSettings: () => void;
+  onToggleAlert: () => void;
 };
 
 const STATUS_COLOR: Record<Status, "violet" | "red" | "blue" | "peach"> = {
@@ -19,16 +22,20 @@ const STATUS_COLOR: Record<Status, "violet" | "red" | "blue" | "peach"> = {
   MODIFIED: "red",
   PREVIEW: "blue",
   STANDBY: "peach",
+  ALERT: "red",
 };
 
 export function LeftRail({
   viewMode,
   status,
+  alert,
   onToggleViewMode,
   onNew,
   onOpen,
   onSave,
   onSaveAs,
+  onOpenSettings,
+  onToggleAlert,
 }: LeftRailProps) {
   return (
     <div className="lcars-rail" role="navigation" aria-label="Primary">
@@ -45,6 +52,13 @@ export function LeftRail({
         ariaLabel={
           viewMode === "preview" ? "Back to editor" : "Show markdown preview"
         }
+      />
+      <Pill label="SETTINGS" color="blue" onClick={onOpenSettings} />
+      <Pill
+        label={alert ? "STAND DOWN" : "ALERT"}
+        color={alert ? "tan" : "red"}
+        onClick={onToggleAlert}
+        ariaLabel={alert ? "Stand down from red alert" : "Sound red alert"}
       />
       {import.meta.env.DEV ? (
         <Pill
