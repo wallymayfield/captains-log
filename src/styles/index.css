@@ -249,6 +249,34 @@ body,
   border-bottom-right-radius: 999px;
 }
 
+/* Interactive bar — bar rendered as a <button>. Visual identical, plus
+   hover/active/focus states. Reset native button look. */
+.lcars-bar--interactive {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: filter 80ms linear;
+}
+.lcars-bar--interactive:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.lcars-bar--interactive:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+.lcars-bar--interactive:focus-visible {
+  outline: 2px solid var(--lcars-text-body);
+  outline-offset: 2px;
+}
+.lcars-bar--interactive:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* ----------------------------------------------------------
    Pill primitive — fully rounded interactive button.
    ---------------------------------------------------------- */
@@ -476,6 +504,57 @@ body,
   border-radius: 3px;
   font-family: "Antonio", Impact, sans-serif;
   letter-spacing: 0.04em;
+}
+
+/* ----------------------------------------------------------
+   Error banner — LCARS red, sits at the top of the stage.
+   ---------------------------------------------------------- */
+
+.lcars-error {
+  flex: 0 0 auto;
+  background: var(--lcars-red);
+  color: var(--lcars-bg);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: "Antonio", Impact, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+.lcars-error__label {
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  flex: 0 0 auto;
+}
+.lcars-error__message {
+  flex: 1 1 auto;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-weight: 400;
+  font-size: 14px;
+  word-break: break-word;
+}
+.lcars-error__dismiss {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--lcars-bg);
+  color: var(--lcars-bg);
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.lcars-error__dismiss:hover {
+  background: rgba(0, 0, 0, 0.12);
 }
 
 /* ----------------------------------------------------------
