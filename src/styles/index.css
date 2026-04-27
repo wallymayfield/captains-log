@@ -1,0 +1,318 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Captain's Log — LCARS design layer
+   Palette: canonical Okuda. Type: Antonio (UI), Newsreader (body).
+   ============================================================ */
+
+:root {
+  --lcars-orange: #ff9933;
+  --lcars-peach: #ffcc99;
+  --lcars-pink: #cc6699;
+  --lcars-violet: #9999ff;
+  --lcars-blue: #6699cc;
+  --lcars-tan: #ffcc66;
+  --lcars-red: #cc6666;
+  --lcars-bg: #000000;
+  --lcars-text: var(--lcars-orange);
+  --lcars-text-body: #ffffff;
+
+  /* Geometry */
+  --rail-width: 196px;
+  --top-height: 64px;
+  --bottom-height: 56px;
+  --gap: 6px;
+
+  /* The horizontal arm of the elbow runs the height of the top/bottom bar.
+     The vertical stem runs the width of the rail. */
+  --elbow-arm-h: var(--top-height);
+  --elbow-arm-h-bottom: var(--bottom-height);
+  --elbow-stem-w: 96px;
+  --elbow-outer-radius: 64px;
+  --elbow-inner-radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--lcars-bg);
+  color: var(--lcars-text);
+  font-family: "Antonio", Impact, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* The center stage is the only place we want native text selection. */
+.lcars-stage,
+.lcars-stage * {
+  user-select: text;
+}
+
+/* ----------------------------------------------------------
+   Shell layout
+   ---------------------------------------------------------- */
+
+.lcars-shell {
+  display: grid;
+  grid-template-columns: var(--rail-width) 1fr;
+  grid-template-rows: var(--top-height) 1fr var(--bottom-height);
+  gap: var(--gap);
+  height: 100vh;
+  width: 100vw;
+  padding: var(--gap);
+  background: var(--lcars-bg);
+}
+
+.lcars-shell__elbow-tl {
+  grid-column: 1;
+  grid-row: 1;
+}
+.lcars-shell__topbar {
+  grid-column: 2;
+  grid-row: 1;
+}
+.lcars-shell__rail {
+  grid-column: 1;
+  grid-row: 2;
+}
+.lcars-shell__stage {
+  grid-column: 2;
+  grid-row: 2;
+}
+.lcars-shell__elbow-bl {
+  grid-column: 1;
+  grid-row: 3;
+}
+.lcars-shell__bottombar {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* ----------------------------------------------------------
+   Elbow primitive
+   The L-shape is built from a colored block with the OUTER corner
+   rounded, plus a black inset pseudo-element whose reverse-rounded
+   corner carves the INSIDE curve.
+   ---------------------------------------------------------- */
+
+.lcars-elbow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--elbow-color, var(--lcars-orange));
+}
+
+.lcars-elbow::after {
+  content: "";
+  position: absolute;
+  background: var(--lcars-bg);
+}
+
+/* Top-left: outer corner is top-left, inside corner is bottom-right of arm joint */
+.lcars-elbow--tl {
+  border-top-left-radius: var(--elbow-outer-radius);
+}
+.lcars-elbow--tl::after {
+  top: var(--elbow-arm-h);
+  right: 0;
+  bottom: calc(-1 * var(--gap)); /* extend into the gap so no seam appears */
+  left: var(--elbow-stem-w);
+  border-top-left-radius: var(--elbow-inner-radius);
+}
+
+/* Bottom-left: outer corner is bottom-left, inside corner is top-right of arm joint */
+.lcars-elbow--bl {
+  border-bottom-left-radius: var(--elbow-outer-radius);
+}
+.lcars-elbow--bl::after {
+  top: calc(-1 * var(--gap));
+  right: 0;
+  bottom: var(--elbow-arm-h-bottom);
+  left: var(--elbow-stem-w);
+  border-bottom-left-radius: var(--elbow-inner-radius);
+}
+
+/* The elbow can carry a corner label like the top bar does. */
+.lcars-elbow__label {
+  position: absolute;
+  bottom: 6px;
+  right: 12px;
+  color: var(--lcars-bg);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.lcars-elbow--bl .lcars-elbow__label {
+  bottom: auto;
+  top: 6px;
+}
+
+/* ----------------------------------------------------------
+   Bar primitive — solid colored block, label in bottom-right
+   ---------------------------------------------------------- */
+
+.lcars-bar {
+  position: relative;
+  background: var(--bar-color, var(--lcars-orange));
+  color: var(--lcars-bg);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-family: "Antonio", Impact, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  min-height: 28px;
+  font-size: 14px;
+}
+
+.lcars-bar__title {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex: 1;
+}
+.lcars-bar__doc {
+  color: var(--lcars-bg);
+  opacity: 0.78;
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.lcars-bar__id {
+  position: absolute;
+  bottom: 4px;
+  right: 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* When a bar is rounded on its end (the head/tail of a row of bars). */
+.lcars-bar--round-l {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+.lcars-bar--round-r {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+/* ----------------------------------------------------------
+   Left rail — vertical stack of bars
+   ---------------------------------------------------------- */
+
+.lcars-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  height: 100%;
+  width: 100%;
+}
+
+.lcars-rail__bar {
+  flex: 0 0 auto;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px 0 18px;
+  background: var(--bar-color, var(--lcars-orange));
+  color: var(--lcars-bg);
+  font-family: "Antonio", Impact, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 14px;
+  position: relative;
+}
+.lcars-rail__bar--filler {
+  flex: 1 1 auto;
+}
+.lcars-rail__bar-id {
+  position: absolute;
+  bottom: 3px;
+  right: 10px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+/* ----------------------------------------------------------
+   Center stage — black, hosts the writing area in later steps
+   ---------------------------------------------------------- */
+
+.lcars-stage {
+  position: relative;
+  background: var(--lcars-bg);
+  color: var(--lcars-text-body);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lcars-stage__placeholder {
+  font-family: "Antonio", Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 14px;
+  color: var(--lcars-orange);
+  opacity: 0.55;
+}
+
+/* ----------------------------------------------------------
+   Top bar / bottom bar specifics — they’re lcars-bar with
+   end caps. Top bar always orange, bottom bar tan by default.
+   ---------------------------------------------------------- */
+
+.lcars-topbar {
+  --bar-color: var(--lcars-orange);
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+  height: 100%;
+}
+
+.lcars-bottombar {
+  --bar-color: var(--lcars-tan);
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+  height: 100%;
+}
+
+.lcars-topbar__stardate,
+.lcars-bottombar__stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.lcars-topbar__stardate-label,
+.lcars-bottombar__stat-label {
+  opacity: 0.7;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.lcars-bottombar__stats {
+  display: flex;
+  gap: 22px;
+  flex: 1;
+}
+.lcars-bottombar__date {
+  margin-left: auto;
+  opacity: 0.8;
+}

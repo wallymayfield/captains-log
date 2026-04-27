@@ -1,0 +1,28 @@
+[package]
+name = "captains-log"
+version = "0.1.0"
+description = "Local-first LCARS-themed markdown writer."
+authors = ["Captain's Log contributors"]
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "captains_log_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.3", features = [] }
+
+[dependencies]
+tauri = { version = "2.1.1", features = [] }
+tauri-plugin-fs = "2.0.3"
+tauri-plugin-dialog = "2.0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

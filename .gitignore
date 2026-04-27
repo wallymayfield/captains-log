@@ -1,0 +1,28 @@
+# Node / Vite
+node_modules
+dist
+dist-ssr
+.vite
+*.log
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea
+.vscode/*
+!.vscode/extensions.json
+
+# Rust / Tauri
+src-tauri/target
+src-tauri/Cargo.lock
+src-tauri/gen
+
+# Coverage / cache
+coverage
+.cache
+
+# TS project-references build info
+*.tsbuildinfo
