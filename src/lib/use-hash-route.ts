@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-export type Route = "editor" | "showcase";
+export type Route = "editor" | "schematic";
 
 function parse(hash: string): Route {
-  return hash === "#/showcase" ? "showcase" : "editor";
+  return hash === "#/schematic" ? "schematic" : "editor";
 }
 
 export function useHashRoute(): Route {
@@ -17,5 +17,5 @@ export function useHashRoute(): Route {
 }
 
 export function navigate(route: Route): void {
-  window.location.hash = route === "showcase" ? "#/showcase" : "#/";
+  window.location.hash = route === "schematic" ? "#/schematic" : "#/";
 }

@@ -1,5 +1,5 @@
 import { Bar } from "@/components/primitives";
-import { navigate } from "@/lib/use-hash-route";
+import { navigate, type Route } from "@/lib/use-hash-route";
 
 export type ViewMode = "write" | "preview";
 export type Status = "READY" | "MODIFIED" | "PREVIEW" | "STANDBY" | "ALERT";
@@ -7,6 +7,7 @@ export type Status = "READY" | "MODIFIED" | "PREVIEW" | "STANDBY" | "ALERT";
 type LeftRailProps = {
   viewMode: ViewMode;
   status: Status;
+  route: Route;
   onToggleViewMode: () => void;
   onNew: () => void;
   onOpen: () => void;
@@ -15,7 +16,10 @@ type LeftRailProps = {
   onOpenSettings: () => void;
 };
 
-const STATUS_COLOR: Record<Status, "orange" | "violet" | "red" | "blue" | "peach"> = {
+const STATUS_COLOR: Record<
+  Status,
+  "orange" | "violet" | "red" | "blue" | "peach"
+> = {
   READY: "orange",
   MODIFIED: "red",
   PREVIEW: "blue",
@@ -26,6 +30,7 @@ const STATUS_COLOR: Record<Status, "orange" | "violet" | "red" | "blue" | "peach
 export function LeftRail({
   viewMode,
   status,
+  route,
   onToggleViewMode,
   onNew,
   onOpen,
@@ -33,6 +38,7 @@ export function LeftRail({
   onSaveAs,
   onOpenSettings,
 }: LeftRailProps) {
+  const onSchematic = route === "schematic";
   return (
     <div className="lcars-rail" role="navigation" aria-label="Primary">
       <Bar label="NEW" color="orange" onClick={onNew} />
@@ -50,13 +56,14 @@ export function LeftRail({
         }
       />
       <Bar label="SETTINGS" color="violet" onClick={onOpenSettings} />
-      {import.meta.env.DEV ? (
-        <Bar
-          label="PRIMITIVES"
-          color="blue"
-          onClick={() => navigate("showcase")}
-        />
-      ) : null}
+      <Bar
+        label={onSchematic ? "EDITOR" : "SCHEMATIC"}
+        color={onSchematic ? "orange" : "blue"}
+        onClick={() => navigate(onSchematic ? "editor" : "schematic")}
+        ariaLabel={
+          onSchematic ? "Back to editor" : "Show ship schematic"
+        }
+      />
     </div>
   );
 }

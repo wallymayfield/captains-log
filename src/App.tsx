@@ -6,7 +6,7 @@ import { LeftRail, type Status, type ViewMode } from "@/components/LeftRail";
 import { TopBar } from "@/components/TopBar";
 import { BottomBar } from "@/components/BottomBar";
 import { CenterStage } from "@/components/CenterStage";
-import { Showcase } from "@/components/Showcase";
+import { Schematic } from "@/components/Schematic";
 import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { ErrorBanner } from "@/components/ErrorBanner";
@@ -178,8 +178,8 @@ export function App() {
   });
 
   const stageContent =
-    route === "showcase" ? (
-      <Showcase />
+    route === "schematic" ? (
+      <Schematic date={now} />
     ) : viewMode === "preview" ? (
       <Preview doc={doc} />
     ) : (
@@ -188,7 +188,7 @@ export function App() {
 
   const status: Status = alert
     ? "ALERT"
-    : route === "showcase"
+    : route === "schematic"
       ? "STANDBY"
       : viewMode === "preview"
         ? "PREVIEW"
@@ -206,8 +206,8 @@ export function App() {
         topBar={
           <TopBar
             documentTitle={
-              route === "showcase"
-                ? "PRIMITIVES SHOWCASE"
+              route === "schematic"
+                ? "EXTERIOR SCHEMATIC"
                 : `${dirty ? "• " : ""}${docTitle.toUpperCase()}`
             }
             status={status}
@@ -218,6 +218,7 @@ export function App() {
           <LeftRail
             viewMode={viewMode}
             status={status}
+            route={route}
             onToggleViewMode={toggleViewMode}
             onNew={handleNew}
             onOpen={handleOpen}
