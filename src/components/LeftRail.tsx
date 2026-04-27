@@ -38,7 +38,12 @@ export function LeftRail({
   onSaveAs,
   onOpenSettings,
 }: LeftRailProps) {
-  const onSchematic = route === "schematic";
+  const togglePreview = () => {
+    onToggleViewMode();
+    // From the schematic page, the WRITE/PREVIEW bar should also
+    // bring the user back to the editor in the chosen mode.
+    if (route === "schematic") navigate("editor");
+  };
   return (
     <div className="lcars-rail" role="navigation" aria-label="Primary">
       <Bar label="NEW" color="orange" onClick={onNew} />
@@ -50,19 +55,17 @@ export function LeftRail({
       <Bar
         label={viewMode === "preview" ? "WRITE" : "PREVIEW"}
         color={viewMode === "preview" ? "orange" : "peach"}
-        onClick={onToggleViewMode}
+        onClick={togglePreview}
         ariaLabel={
           viewMode === "preview" ? "Back to editor" : "Show markdown preview"
         }
       />
       <Bar label="SETTINGS" color="violet" onClick={onOpenSettings} />
       <Bar
-        label={onSchematic ? "EDITOR" : "SCHEMATIC"}
-        color={onSchematic ? "orange" : "blue"}
-        onClick={() => navigate(onSchematic ? "editor" : "schematic")}
-        ariaLabel={
-          onSchematic ? "Back to editor" : "Show ship schematic"
-        }
+        label="SCHEMATIC"
+        color="blue"
+        onClick={() => navigate("schematic")}
+        ariaLabel="Show ship schematic"
       />
     </div>
   );
