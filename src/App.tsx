@@ -100,6 +100,7 @@ export function App() {
     setSavedDoc(fresh);
     setPath(null);
     setError(null);
+    setViewMode("write");
   }, [confirmDiscard]);
 
   const handleOpen = useCallback(async () => {
