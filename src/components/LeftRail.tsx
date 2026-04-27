@@ -15,8 +15,8 @@ type LeftRailProps = {
   onOpenSettings: () => void;
 };
 
-const STATUS_COLOR: Record<Status, "violet" | "red" | "blue" | "peach"> = {
-  READY: "violet",
+const STATUS_COLOR: Record<Status, "orange" | "violet" | "red" | "blue" | "peach"> = {
+  READY: "orange",
   MODIFIED: "red",
   PREVIEW: "blue",
   STANDBY: "peach",
@@ -43,13 +43,13 @@ export function LeftRail({
       <Bar label={status} color={STATUS_COLOR[status]} />
       <Bar
         label={viewMode === "preview" ? "WRITE" : "PREVIEW"}
-        color={viewMode === "preview" ? "orange" : "violet"}
+        color={viewMode === "preview" ? "orange" : "peach"}
         onClick={onToggleViewMode}
         ariaLabel={
           viewMode === "preview" ? "Back to editor" : "Show markdown preview"
         }
       />
-      <Bar label="SETTINGS" color="blue" onClick={onOpenSettings} />
+      <Bar label="SETTINGS" color="violet" onClick={onOpenSettings} />
       {import.meta.env.DEV ? (
         <Bar
           label="PRIMITIVES"
