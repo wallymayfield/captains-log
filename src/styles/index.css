@@ -780,27 +780,6 @@ body,
   letter-spacing: 0.1em;
   color: var(--lcars-text-body);
 }
-
-/* Bridge-ambient mute toggle in the bottom-right corner */
-.lcars-schematic__mute {
-  appearance: none;
-  margin-top: 6px;
-  background: transparent;
-  border: 1px solid var(--lcars-orange);
-  border-radius: 999px;
-  color: var(--lcars-orange);
-  font-family: "Antonio", Impact, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  padding: 4px 14px;
-  cursor: pointer;
-  transition: all 80ms linear;
-}
-.lcars-schematic__mute:hover {
-  background: var(--lcars-orange);
-  color: var(--lcars-bg);
-}
 .lcars-msd__outline {
   fill: none;
   stroke: var(--lcars-text-body);

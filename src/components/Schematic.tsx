@@ -1,15 +1,13 @@
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { Ship } from "./schematic/Ship";
 import { useTicker } from "@/lib/use-ticker";
 import { formatStardate } from "@/lib/stardate";
-import { startBridgeAmbient, stopBridgeAmbient } from "@/lib/sound";
 
 const STAR_COUNT = 90;
 
 export function Schematic() {
-  const [muted, setMuted] = useState(false);
   const now = useTicker(60_000);
 
   const stars = useMemo(
@@ -23,15 +21,6 @@ export function Schematic() {
       })),
     [],
   );
-
-  useEffect(() => {
-    if (muted) {
-      stopBridgeAmbient();
-    } else {
-      startBridgeAmbient();
-    }
-    return () => stopBridgeAmbient();
-  }, [muted]);
 
   return (
     <div className="lcars-schematic">
@@ -116,20 +105,10 @@ export function Schematic() {
         </span>
       </div>
 
-      {/* Bottom-right: heading + ambient mute toggle */}
+      {/* Bottom-right: heading */}
       <div className="lcars-schematic__corner lcars-schematic__corner--br">
         <span className="lcars-schematic__readout-label">Heading</span>
         <span className="lcars-schematic__readout-value">287 mark 19</span>
-        <button
-          type="button"
-          className="lcars-schematic__mute"
-          onClick={() => setMuted((m) => !m)}
-          aria-label={
-            muted ? "Unmute bridge ambient" : "Mute bridge ambient"
-          }
-        >
-          {muted ? "Audio · Off" : "Audio · On"}
-        </button>
       </div>
     </div>
   );

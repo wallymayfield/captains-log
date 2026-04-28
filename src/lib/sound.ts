@@ -6,19 +6,15 @@
 
 import type { Settings } from "@/lib/settings";
 import alertUrl from "@/assets/red-alert.mp3";
-import bridgeAmbientUrl from "@/assets/bridge-ambient.mp3";
 
 let active: Settings = { soundsEnabled: true, volume: 0.5 };
 let ctx: AudioContext | null = null;
 let alertAudio: HTMLAudioElement | null = null;
-let bridgeAudio: HTMLAudioElement | null = null;
-let bridgeRequested = false;
 
 export function setActiveSettings(s: Settings): void {
   active = s;
   if (alertAudio) alertAudio.volume = s.volume;
   if (!s.soundsEnabled) stopRedAlert();
-  syncBridge();
 }
 
 function getAlertAudio(): HTMLAudioElement {
@@ -120,40 +116,4 @@ export function stopRedAlert(): void {
   if (!alertAudio) return;
   alertAudio.pause();
   alertAudio.currentTime = 0;
-}
-
-// Bridge ambient — looping background tone used on the schematic page.
-// Honors both the global settings.soundsEnabled and a per-page request
-// flag (toggled by the mute control on the schematic).
-function getBridgeAudio(): HTMLAudioElement {
-  if (!bridgeAudio) {
-    bridgeAudio = new Audio(bridgeAmbientUrl);
-    bridgeAudio.loop = true;
-    bridgeAudio.preload = "auto";
-  }
-  return bridgeAudio;
-}
-
-function syncBridge(): void {
-  if (!bridgeRequested || !active.soundsEnabled) {
-    if (bridgeAudio && !bridgeAudio.paused) bridgeAudio.pause();
-    return;
-  }
-  const a = getBridgeAudio();
-  a.volume = active.volume * 0.45;
-  if (a.paused) {
-    void a.play().catch(() => {
-      /* autoplay blocked; will start on next user gesture */
-    });
-  }
-}
-
-export function startBridgeAmbient(): void {
-  bridgeRequested = true;
-  syncBridge();
-}
-
-export function stopBridgeAmbient(): void {
-  bridgeRequested = false;
-  syncBridge();
 }
