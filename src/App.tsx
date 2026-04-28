@@ -11,7 +11,7 @@ import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { SettingsPanel } from "@/components/Settings";
-import { useHashRoute } from "@/lib/use-hash-route";
+import { navigate, useHashRoute } from "@/lib/use-hash-route";
 import { useTicker } from "@/lib/use-ticker";
 import { useShortcuts } from "@/lib/use-shortcuts";
 import {
@@ -101,6 +101,7 @@ export function App() {
     setPath(null);
     setError(null);
     setViewMode("write");
+    navigate("editor");
   }, [confirmDiscard]);
 
   const handleOpen = useCallback(async () => {
@@ -114,6 +115,7 @@ export function App() {
       setPath(result.path);
       setError(null);
       play("success");
+      navigate("editor");
     } catch (e) {
       play("failure");
       setError(messageOf(e));
