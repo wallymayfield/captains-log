@@ -117,14 +117,15 @@ function Hull({
   );
 }
 
-// Pylon: a simple cylinder from inside the engineering hull's
-// back-bottom-side to inside the nacelle bottom. Round cross-section
-// avoids any roll-orientation issues and embeds cleanly into the
-// curved hull and nacelle surfaces.
+// Pylon: cylinder from JUST INSIDE the engineering hull's surface
+// (~85% radial depth — far enough in to avoid a gap at the contact
+// point, but not so deep that the embedded stub is visible through
+// the transparent hull) to inside the nacelle. Open-ended so there
+// are no flat end caps to render in either host volume.
 function Pylon({ side }: { side: number }) {
   const { position, rotation, length } = useMemo(() => {
-    const start = new THREE.Vector3(side * 0.28, -0.78, -1.85);
-    const end = new THREE.Vector3(side * 1.02, 0.0, -1.4);
+    const start = new THREE.Vector3(side * 0.34, -0.5, -2.1);
+    const end = new THREE.Vector3(side * 1.05, 0.05, -1.4);
     const mid = start.clone().add(end).multiplyScalar(0.5);
     const len = start.distanceTo(end);
     const dir = end.clone().sub(start).normalize();
@@ -142,7 +143,7 @@ function Pylon({ side }: { side: number }) {
 
   return (
     <mesh position={position} rotation={rotation}>
-      <cylinderGeometry args={[0.085, 0.085, length, 16]} />
+      <cylinderGeometry args={[0.095, 0.095, length, 16, 1, true]} />
       <Hull />
     </mesh>
   );
