@@ -841,6 +841,56 @@ body,
   stroke-width: 1;
 }
 
+/* Centered engage button at the bottom of the schematic stage. */
+.lcars-schematic__engage {
+  position: absolute;
+  z-index: 11;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  --pill-color: var(--lcars-tan);
+  letter-spacing: 0.14em;
+  padding: 10px 28px;
+  font-size: 15px;
+}
+.lcars-schematic__engage:active:not(:disabled) {
+  transform: translateX(-50%) translateY(1px);
+}
+
+/* Stars elongate horizontally during warp-out / warp-in for the
+   classic streak effect. */
+.lcars-schematic__star {
+  transition:
+    width 220ms ease-in,
+    opacity 220ms ease-in;
+}
+.lcars-schematic--streaking .lcars-schematic__star {
+  width: 80px !important;
+  opacity: 0.85;
+  animation: none;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+/* Brief white flash during the warp-out punch and warp-in arrival. */
+.lcars-schematic__flash {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+.lcars-schematic__flash[data-active="true"] {
+  opacity: 1;
+  transition: opacity 60ms ease-in;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lcars-schematic__star {
     animation: none;

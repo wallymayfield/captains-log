@@ -6,10 +6,12 @@
 
 import type { Settings } from "@/lib/settings";
 import alertUrl from "@/assets/red-alert.mp3";
+import warpEngageUrl from "@/assets/warp-engage.mp3";
 
 let active: Settings = { soundsEnabled: true, volume: 0.5 };
 let ctx: AudioContext | null = null;
 let alertAudio: HTMLAudioElement | null = null;
+let warpEngageAudio: HTMLAudioElement | null = null;
 
 export function setActiveSettings(s: Settings): void {
   active = s;
@@ -116,4 +118,23 @@ export function stopRedAlert(): void {
   if (!alertAudio) return;
   alertAudio.pause();
   alertAudio.currentTime = 0;
+}
+
+function getWarpEngageAudio(): HTMLAudioElement {
+  if (!warpEngageAudio) {
+    warpEngageAudio = new Audio(warpEngageUrl);
+    warpEngageAudio.volume = active.volume;
+    warpEngageAudio.preload = "auto";
+  }
+  return warpEngageAudio;
+}
+
+export function playWarpEngage(): void {
+  if (!active.soundsEnabled) return;
+  const a = getWarpEngageAudio();
+  a.volume = active.volume;
+  a.currentTime = 0;
+  void a.play().catch(() => {
+    /* autoplay blocked until first user gesture; ignore */
+  });
 }
