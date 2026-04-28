@@ -112,7 +112,7 @@ export function Schematic() {
       <div className="lcars-schematic__corner lcars-schematic__corner--bl">
         <span className="lcars-schematic__readout-label">Designation</span>
         <span className="lcars-schematic__readout-value">
-          USS Horizon · NCC-2401
+          USS Mayfield · NCC-3047
         </span>
       </div>
 
