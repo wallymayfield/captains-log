@@ -56,13 +56,14 @@ const ENGINEERING_PROFILE = [
 // 2D side profile in shape XY (X = front-back, Y = vertical). Wider
 // at the bottom (engineering attach), narrower at the top (saucer
 // attach), with the top edge shifted forward — the canonical
-// forward-leaning sail.
+// forward-leaning sail. Top is tall enough to bury into the saucer
+// underside so the connection reads as continuous.
 const DORSAL_FIN_SHAPE = (() => {
   const s = new THREE.Shape();
   s.moveTo(-0.6, 0);
   s.lineTo(0.5, 0);
-  s.lineTo(0.32, 0.55);
-  s.lineTo(-0.08, 0.55);
+  s.lineTo(0.25, 0.72);
+  s.lineTo(-0.05, 0.72);
   s.lineTo(-0.6, 0);
   return s;
 })();
@@ -128,12 +129,16 @@ function Hull({
 
 // Curved pylon: cross-section swept along a CatmullRomCurve3 from
 // the engineering hull's lower-side outward to the nacelle bottom.
+// The last two control points share z with the end point so the
+// tangent at the nacelle attachment lies in the XY plane — the
+// cross-section orients cleanly perpendicular to the nacelle axis
+// rather than twisting at the join.
 function CurvedPylon({ side }: { side: number }) {
   const geo = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(side * 0.36, -0.78, -1.4),
-      new THREE.Vector3(side * 0.62, -0.6, -1.55),
-      new THREE.Vector3(side * 0.9, -0.32, -1.55),
+      new THREE.Vector3(side * 0.6, -0.62, -1.5),
+      new THREE.Vector3(side * 0.9, -0.32, -1.4),
       new THREE.Vector3(side * 1.05, -0.13, -1.4),
     ]);
     return new THREE.ExtrudeGeometry(PYLON_CROSS_SECTION, {
@@ -259,9 +264,10 @@ export function Ship() {
 
       {/* Dorsal fin — rises from engineering top to saucer underside.
           Shape is in XY of geometry frame; rotated around Y by -π/2
-          so shape's X aligns with scene's +Z (forward). */}
+          so shape's X aligns with scene's +Z (forward). Position.x
+          is shifted by depth/2 so the extrusion is centered at x=0. */}
       <mesh
-        position={[-0.08, -0.3, -0.95]}
+        position={[0.08, -0.3, -0.95]}
         rotation={[0, -Math.PI / 2, 0]}
       >
         <extrudeGeometry args={[DORSAL_FIN_SHAPE, DORSAL_FIN_EXTRUDE]} />
