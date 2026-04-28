@@ -69,16 +69,6 @@ const DORSAL_FIN_SHAPE = (() => {
 })();
 const DORSAL_FIN_EXTRUDE = { depth: 0.16, bevelEnabled: false };
 
-// ---------- Pylon cross-section ----------
-const PYLON_CROSS_SECTION = (() => {
-  const s = new THREE.Shape();
-  s.moveTo(-0.04, -0.18);
-  s.lineTo(0.04, -0.18);
-  s.lineTo(0.04, 0.18);
-  s.lineTo(-0.04, 0.18);
-  s.lineTo(-0.04, -0.18);
-  return s;
-})();
 
 type EmissivePulseProps = {
   color: string;
@@ -127,52 +117,54 @@ function Hull({
   );
 }
 
-// Curved pylon: cross-section swept along a CatmullRomCurve3 from
-// the engineering hull's BACK-BOTTOM-SIDE forward, outward, and up
-// to the nacelle bottom (mid-nacelle). The last two control points
-// share z with the end point so the tangent at the nacelle
-// attachment lies in the XY plane — the cross-section orients
-// cleanly perpendicular to the nacelle axis.
-function CurvedPylon({ side }: { side: number }) {
-  const geo = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.34, -0.85, -1.95),
-      new THREE.Vector3(side * 0.55, -0.7, -1.7),
-      new THREE.Vector3(side * 0.85, -0.4, -1.4),
-      new THREE.Vector3(side * 1.05, -0.13, -1.4),
-    ]);
-    return new THREE.ExtrudeGeometry(PYLON_CROSS_SECTION, {
-      steps: 32,
-      bevelEnabled: false,
-      extrudePath: curve,
-    });
+// Pylon: a simple straight slab from engineering hull's
+// back-bottom-side to the nacelle bottom. Single rotated box —
+// avoids the Frenet-frame twisting issues of a curved extrusion.
+function Pylon({ side }: { side: number }) {
+  const { position, rotation, length } = useMemo(() => {
+    const start = new THREE.Vector3(side * 0.36, -0.82, -1.9);
+    const end = new THREE.Vector3(side * 1.05, -0.05, -1.4);
+    const mid = start.clone().add(end).multiplyScalar(0.5);
+    const len = start.distanceTo(end);
+    const dir = end.clone().sub(start).normalize();
+    const quat = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      dir,
+    );
+    const eu = new THREE.Euler().setFromQuaternion(quat);
+    return {
+      position: [mid.x, mid.y, mid.z] as [number, number, number],
+      rotation: [eu.x, eu.y, eu.z] as [number, number, number],
+      length: len,
+    };
   }, [side]);
 
   return (
-    <mesh geometry={geo}>
+    <mesh position={position} rotation={rotation}>
+      <boxGeometry args={[0.1, length, 0.32]} />
       <Hull />
     </mesh>
   );
 }
 
 // Concentric deflector dish — blue outer / amber middle / red center.
-// Rings sit in the XY plane with normals pointing forward (+Z), set
-// into the engineering hull's nose so they read as part of the front
-// surface rather than a flat tab sticking out.
+// Bigger and inverted layering so the inner glow sits DEEPEST and the
+// outer ring is at the surface — gives a recessed-bowl read instead
+// of a bulge. All materials double-sided.
 function Deflector({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
       <mesh>
-        <ringGeometry args={[0.11, 0.17, 40]} />
+        <ringGeometry args={[0.16, 0.24, 40]} />
         <meshBasicMaterial
           color={COIL_COLOR}
           transparent
-          opacity={0.65}
+          opacity={0.7}
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[0, 0, 0.006]}>
-        <ringGeometry args={[0.05, 0.11, 40]} />
+      <mesh position={[0, 0, -0.008]}>
+        <ringGeometry args={[0.08, 0.16, 40]} />
         <meshBasicMaterial
           color={ACCENT_COLOR}
           transparent
@@ -180,13 +172,14 @@ function Deflector({ position }: { position: [number, number, number] }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[0, 0, 0.012]}>
-        <circleGeometry args={[0.05, 32]} />
-        <EmissivePulse
+      <mesh position={[0, 0, -0.016]}>
+        <circleGeometry args={[0.08, 32]} />
+        <meshStandardMaterial
           color={BUSSARD_COLOR}
-          base={1.6}
-          amp={0.4}
-          freq={1.3}
+          emissive={BUSSARD_COLOR}
+          emissiveIntensity={1.6}
+          roughness={0.4}
+          side={THREE.DoubleSide}
         />
       </mesh>
     </group>
@@ -261,11 +254,11 @@ export function Ship() {
           <Hull threshold={8} />
         </mesh>
 
-        {/* Deflector recessed into the hull's nose — positioned at
-            engineering local z=0.88 (world z≈-0.52) where the hull
-            has enough radius for the rings to read clearly without
-            poking through the surface. */}
-        <Deflector position={[0, 0.0, 0.88]} />
+        {/* Deflector recessed into the hull's nose at engineering
+            local z=0.95 (world z≈-0.45) — the hull has enough radius
+            here for the larger rings while still reading as a forward
+            feature. */}
+        <Deflector position={[0, 0.0, 0.95]} />
       </group>
 
       {/* Dorsal fin — rises from engineering top to saucer underside.
@@ -288,7 +281,7 @@ export function Ship() {
           ============================================================ */}
       {[1, -1].map((side) => (
         <group key={`nac-${side}`}>
-          <CurvedPylon side={side} />
+          <Pylon side={side} />
 
           {/* Nacelle main body — closed cylinder, axis along scene Z */}
           <mesh
