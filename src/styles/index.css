@@ -738,6 +738,69 @@ body,
 .lcars-schematic__canvas:active {
   cursor: grabbing;
 }
+
+/* LCARS-style readouts in each corner of the schematic page */
+.lcars-schematic__corner {
+  position: absolute;
+  z-index: 10;
+  font-family: "Antonio", Impact, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.lcars-schematic__corner--tl {
+  top: 28px;
+  left: 32px;
+}
+.lcars-schematic__corner--tr {
+  top: 28px;
+  right: 32px;
+  align-items: flex-end;
+}
+.lcars-schematic__corner--bl {
+  bottom: 28px;
+  left: 32px;
+}
+.lcars-schematic__corner--br {
+  bottom: 28px;
+  right: 32px;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+.lcars-schematic__readout-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--lcars-orange);
+  opacity: 0.75;
+}
+.lcars-schematic__readout-value {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: var(--lcars-text-body);
+}
+
+/* Bridge-ambient mute toggle in the bottom-right corner */
+.lcars-schematic__mute {
+  appearance: none;
+  margin-top: 6px;
+  background: transparent;
+  border: 1px solid var(--lcars-orange);
+  border-radius: 999px;
+  color: var(--lcars-orange);
+  font-family: "Antonio", Impact, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: all 80ms linear;
+}
+.lcars-schematic__mute:hover {
+  background: var(--lcars-orange);
+  color: var(--lcars-bg);
+}
 .lcars-msd__outline {
   fill: none;
   stroke: var(--lcars-text-body);

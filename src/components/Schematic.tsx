@@ -1,13 +1,17 @@
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { Ship } from "./schematic/Ship";
+import { useTicker } from "@/lib/use-ticker";
+import { formatStardate } from "@/lib/stardate";
+import { startBridgeAmbient, stopBridgeAmbient } from "@/lib/sound";
 
 const STAR_COUNT = 90;
 
 export function Schematic() {
-  // Foreground DOM-based starfield: small twinkling dots (the existing
-  // look). Three.js Stars also adds depth in the scene itself.
+  const [muted, setMuted] = useState(false);
+  const now = useTicker(60_000);
+
   const stars = useMemo(
     () =>
       Array.from({ length: STAR_COUNT }, () => ({
@@ -19,6 +23,15 @@ export function Schematic() {
       })),
     [],
   );
+
+  useEffect(() => {
+    if (muted) {
+      stopBridgeAmbient();
+    } else {
+      startBridgeAmbient();
+    }
+    return () => stopBridgeAmbient();
+  }, [muted]);
 
   return (
     <div className="lcars-schematic">
@@ -53,7 +66,6 @@ export function Schematic() {
           color="#6699CC"
         />
 
-        {/* Three.js depth starfield behind the ship */}
         <Stars
           radius={60}
           depth={40}
@@ -79,6 +91,46 @@ export function Schematic() {
           zoomSpeed={0.6}
         />
       </Canvas>
+
+      {/* Top-left: live stardate */}
+      <div className="lcars-schematic__corner lcars-schematic__corner--tl">
+        <span className="lcars-schematic__readout-label">Stardate</span>
+        <span className="lcars-schematic__readout-value">
+          {formatStardate(now)}
+        </span>
+      </div>
+
+      {/* Top-right: position */}
+      <div className="lcars-schematic__corner lcars-schematic__corner--tr">
+        <span className="lcars-schematic__readout-label">Position</span>
+        <span className="lcars-schematic__readout-value">
+          Sector 001 · Alpha
+        </span>
+      </div>
+
+      {/* Bottom-left: ship designation */}
+      <div className="lcars-schematic__corner lcars-schematic__corner--bl">
+        <span className="lcars-schematic__readout-label">Designation</span>
+        <span className="lcars-schematic__readout-value">
+          USS Horizon · NCC-2401
+        </span>
+      </div>
+
+      {/* Bottom-right: heading + ambient mute toggle */}
+      <div className="lcars-schematic__corner lcars-schematic__corner--br">
+        <span className="lcars-schematic__readout-label">Heading</span>
+        <span className="lcars-schematic__readout-value">287 mark 19</span>
+        <button
+          type="button"
+          className="lcars-schematic__mute"
+          onClick={() => setMuted((m) => !m)}
+          aria-label={
+            muted ? "Unmute bridge ambient" : "Mute bridge ambient"
+          }
+        >
+          {muted ? "Audio · Off" : "Audio · On"}
+        </button>
+      </div>
     </div>
   );
 }
