@@ -127,15 +127,14 @@ function Hull({
 }
 
 // Curved pylon: cross-section swept along a CatmullRomCurve3 from
-// the engineering hull mid-side outward (and slightly back) to the
-// nacelle bottom.
+// the engineering hull's lower-side outward to the nacelle bottom.
 function CurvedPylon({ side }: { side: number }) {
   const geo = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.4, -0.55, -1.4),
-      new THREE.Vector3(side * 0.65, -0.45, -1.55),
-      new THREE.Vector3(side * 0.9, -0.25, -1.55),
-      new THREE.Vector3(side * 1.05, -0.1, -1.4),
+      new THREE.Vector3(side * 0.36, -0.78, -1.4),
+      new THREE.Vector3(side * 0.62, -0.6, -1.55),
+      new THREE.Vector3(side * 0.9, -0.32, -1.55),
+      new THREE.Vector3(side * 1.05, -0.13, -1.4),
     ]);
     return new THREE.ExtrudeGeometry(PYLON_CROSS_SECTION, {
       steps: 32,
@@ -270,25 +269,33 @@ export function Ship() {
       </mesh>
 
       {/* ============================================================
-          PYLONS + NACELLES — pylons curve from engineering mid-sides
-          outward to nacelles riding just above engineering top.
+          PYLONS + NACELLES — pylons curve from engineering's lower
+          sides outward to nacelles. Nacelles are a closed cylinder
+          with a single emissive Bussard hemisphere built onto the
+          front; no separate aft cap.
           ============================================================ */}
       {[1, -1].map((side) => (
         <group key={`nac-${side}`}>
           <CurvedPylon side={side} />
 
-          {/* Nacelle main body */}
+          {/* Nacelle main body — closed cylinder, axis along scene Z */}
           <mesh
             position={[side * 1.05, 0.05, -1.4]}
-            scale={[0.18, 0.18, 1.85]}
+            rotation={[Math.PI / 2, 0, 0]}
           >
-            <sphereGeometry args={[1, 28, 18]} />
+            <cylinderGeometry args={[0.18, 0.18, 3.0, 24]} />
             <Hull threshold={8} />
           </mesh>
 
-          {/* Bussard collector — red dome at the FRONT */}
-          <mesh position={[side * 1.05, 0.05, 0.45]}>
-            <sphereGeometry args={[0.22, 24, 18]} />
+          {/* Bussard collector — emissive red hemisphere on the FRONT.
+              Flat side aligns with the cylinder front; dome bulges +z. */}
+          <mesh
+            position={[side * 1.05, 0.05, 0.1]}
+            rotation={[Math.PI / 2, 0, 0]}
+          >
+            <sphereGeometry
+              args={[0.18, 24, 14, 0, Math.PI * 2, 0, Math.PI / 2]}
+            />
             <EmissivePulse
               color={BUSSARD_COLOR}
               base={1.6}
@@ -297,23 +304,17 @@ export function Ship() {
             />
           </mesh>
 
-          {/* Warp coil grille — continuous emissive blue strip on TOP */}
-          <mesh position={[side * 1.05, 0.22, -1.4]}>
-            <boxGeometry args={[0.18, 0.05, 2.8]} />
+          {/* Warp coil grille — embedded blue glow strip in the upper
+              hull. Sits inside the nacelle so it reads as an integral
+              feature glowing through the dark transparent fill. */}
+          <mesh position={[side * 1.05, 0.13, -1.4]}>
+            <boxGeometry args={[0.14, 0.04, 2.6]} />
             <EmissivePulse
               color={COIL_COLOR}
-              base={1.2}
+              base={1.3}
               amp={0.25}
               freq={1.6}
             />
-          </mesh>
-
-          {/* Aft cap */}
-          <mesh position={[side * 1.05, 0.05, -3.25]}>
-            <sphereGeometry
-              args={[0.18, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2]}
-            />
-            <Hull fillOpacity={0.1} />
           </mesh>
         </group>
       ))}
