@@ -7,6 +7,8 @@ export type ShortcutHandlers = {
   onSaveAs: () => void;
   onTogglePreview: () => void;
   onOpenSettings: () => void;
+  onOpenHelp: () => void;
+  onFind: () => void;
 };
 
 // Cmd/Ctrl-modified shortcuts. Handlers are read through a ref so
@@ -40,6 +42,12 @@ export function useShortcuts(handlers: ShortcutHandlers): void {
       } else if (key === "," && !e.shiftKey) {
         e.preventDefault();
         h.onOpenSettings();
+      } else if (key === "/" && !e.shiftKey) {
+        e.preventDefault();
+        h.onOpenHelp();
+      } else if (key === "f" && !e.shiftKey) {
+        e.preventDefault();
+        h.onFind();
       }
     };
     window.addEventListener("keydown", onKeyDown);

@@ -14,6 +14,7 @@ type LeftRailProps = {
   onSave: () => void;
   onSaveAs: () => void;
   onOpenSettings: () => void;
+  onOpenHelp: () => void;
 };
 
 const STATUS_COLOR: Record<
@@ -37,11 +38,10 @@ export function LeftRail({
   onSave,
   onSaveAs,
   onOpenSettings,
+  onOpenHelp,
 }: LeftRailProps) {
   const togglePreview = () => {
     onToggleViewMode();
-    // From the schematic page, the WRITE/PREVIEW bar should also
-    // bring the user back to the editor in the chosen mode.
     if (route === "schematic") navigate("editor");
   };
   return (
@@ -60,6 +60,7 @@ export function LeftRail({
           viewMode === "preview" ? "Back to editor" : "Show markdown preview"
         }
       />
+      <Bar label="HELP" color="tan" onClick={onOpenHelp} />
       <Bar label="SETTINGS" color="violet" onClick={onOpenSettings} />
       <Bar
         label="SCHEMATIC"

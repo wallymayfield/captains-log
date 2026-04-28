@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Doc } from "@/lib/document";
 import { DatePicker } from "./DatePicker";
+import {
+  handleEditorKeyDown,
+  handleEditorPaste,
+} from "@/lib/editor-keys";
 
 type EditorProps = {
   doc: Doc;
@@ -9,6 +13,20 @@ type EditorProps = {
 
 export function Editor({ doc, onChange }: EditorProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const onKey = (e: KeyboardEvent) => handleEditorKeyDown(e, el);
+    const onPaste = (e: ClipboardEvent) => handleEditorPaste(e, el);
+    el.addEventListener("keydown", onKey);
+    el.addEventListener("paste", onPaste);
+    return () => {
+      el.removeEventListener("keydown", onKey);
+      el.removeEventListener("paste", onPaste);
+    };
+  }, []);
 
   return (
     <div className="lcars-editor">
@@ -48,6 +66,7 @@ export function Editor({ doc, onChange }: EditorProps) {
       </div>
 
       <textarea
+        ref={bodyRef}
         className="lcars-editor__body"
         value={doc.body}
         onChange={(e) => onChange({ ...doc, body: e.target.value })}

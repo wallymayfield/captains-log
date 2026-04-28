@@ -28,6 +28,9 @@ export default [
         localStorage: "readonly",
         Audio: "readonly",
         HTMLAudioElement: "readonly",
+        HTMLTextAreaElement: "readonly",
+        HTMLInputElement: "readonly",
+        ClipboardEvent: "readonly",
       },
     },
     plugins: {

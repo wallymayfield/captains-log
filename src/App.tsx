@@ -11,9 +11,12 @@ import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { SettingsPanel } from "@/components/Settings";
+import { MarkdownHelp } from "@/components/MarkdownHelp";
+import { FindReplace } from "@/components/FindReplace";
 import { navigate, useHashRoute } from "@/lib/use-hash-route";
 import { useTicker } from "@/lib/use-ticker";
 import { useShortcuts } from "@/lib/use-shortcuts";
+import { clearDraft, loadDraft, useAutosave } from "@/lib/use-autosave";
 import {
   basename,
   docsEqual,
@@ -38,20 +41,34 @@ type ConfirmRequest = {
   resolve: (v: boolean) => void;
 };
 
+function initialState(): { doc: Doc; path: string | null } {
+  const draft = loadDraft();
+  if (draft) {
+    return { doc: draft.doc, path: draft.path };
+  }
+  return { doc: newDoc(), path: null };
+}
+
 export function App() {
-  const initial = newDoc();
-  const [doc, setDoc] = useState<Doc>(initial);
-  const [savedDoc, setSavedDoc] = useState<Doc>(initial);
-  const [path, setPath] = useState<string | null>(null);
+  // Restore the last draft from localStorage on mount so a crash
+  // or refresh doesn't lose unsaved work.
+  const [{ doc: initialDoc, path: initialPath }] = useState(initialState);
+  const [doc, setDoc] = useState<Doc>(initialDoc);
+  const [savedDoc, setSavedDoc] = useState<Doc>(initialDoc);
+  const [path, setPath] = useState<string | null>(initialPath);
   const [viewMode, setViewMode] = useState<ViewMode>("write");
   const [error, setError] = useState<string | null>(null);
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [findOpen, setFindOpen] = useState(false);
   const [alert, setAlert] = useState(false);
   const [confirmReq, setConfirmReq] = useState<ConfirmRequest | null>(null);
 
   const route = useHashRoute();
   const now = useTicker(60_000);
+
+  useAutosave(doc, path);
 
   // Push settings into the sound module + persist.
   useEffect(() => {
@@ -101,6 +118,7 @@ export function App() {
     setPath(null);
     setError(null);
     setViewMode("write");
+    clearDraft();
     navigate("editor");
   }, [confirmDiscard]);
 
@@ -170,6 +188,16 @@ export function App() {
     setSettingsOpen(true);
   }, []);
 
+  const openHelp = useCallback(() => {
+    play("chirp");
+    setHelpOpen(true);
+  }, []);
+
+  const openFind = useCallback(() => {
+    play("chirp");
+    setFindOpen(true);
+  }, []);
+
   useShortcuts({
     onNew: handleNew,
     onOpen: handleOpen,
@@ -177,6 +205,8 @@ export function App() {
     onSaveAs: handleSaveAs,
     onTogglePreview: toggleViewMode,
     onOpenSettings: openSettings,
+    onOpenHelp: openHelp,
+    onFind: openFind,
   });
 
   const stageContent =
@@ -227,6 +257,7 @@ export function App() {
             onSave={handleSave}
             onSaveAs={handleSaveAs}
             onOpenSettings={openSettings}
+            onOpenHelp={openHelp}
           />
         }
         stage={
@@ -235,6 +266,14 @@ export function App() {
               <ErrorBanner message={error} onDismiss={() => setError(null)} />
             ) : null}
             {stageContent}
+            {findOpen && route !== "schematic" && viewMode === "write" ? (
+              <FindReplace
+                open={findOpen}
+                body={doc.body}
+                onChange={(body) => setDoc({ ...doc, body })}
+                onClose={() => setFindOpen(false)}
+              />
+            ) : null}
           </CenterStage>
         }
         bottomLeft={<Elbow corner="bl" color={alert ? "red" : "tan"} />}
@@ -255,6 +294,7 @@ export function App() {
         onChange={setSettings}
         onClose={() => setSettingsOpen(false)}
       />
+      <MarkdownHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ConfirmDialog
         open={confirmReq !== null}
         title="Captain's Log"

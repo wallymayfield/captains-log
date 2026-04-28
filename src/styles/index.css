@@ -1010,6 +1010,8 @@ body,
   line-height: 1.6;
   resize: none;
   field-sizing: content;
+  /* Cap reading width so long lines stay readable on wide windows. */
+  max-width: 76ch;
   /* Flex-grow fills whatever space is left in the editor when the
      document is short; field-sizing makes it grow past that as the
      user types, which then triggers the stage's overflow scroll. */
@@ -1216,4 +1218,207 @@ body,
 .lcars-preview__body th {
   background: #ebe7dc;
   font-weight: 700;
+}
+
+/* Heading anchor (#) — appears before each heading, hidden until
+   the heading is hovered. */
+.lcars-preview__body .lcars-anchor {
+  color: #c9c2b3;
+  text-decoration: none;
+  margin-right: 0.3em;
+  opacity: 0;
+  transition: opacity 100ms linear;
+}
+.lcars-preview__body :is(h1, h2, h3, h4, h5, h6):hover .lcars-anchor {
+  opacity: 1;
+}
+
+/* Footnote refs and section. */
+.lcars-preview__body sup a,
+.lcars-preview__body .footnote {
+  text-decoration: none;
+  color: #2c5d8a;
+}
+.lcars-preview__body .footnotes {
+  margin-top: 2.5em;
+  padding-top: 1em;
+  border-top: 1px solid #d4cdba;
+  font-size: 0.92em;
+  color: #4a4641;
+}
+.lcars-preview__body .footnotes ol {
+  padding-left: 22px;
+}
+
+/* Light syntax-highlighting theme tuned to match the cream preview
+   background. (highlight.js — common languages.) */
+.lcars-preview__body pre code.hljs {
+  display: block;
+  background: #ebe7dc;
+  color: #1f1d1a;
+}
+.lcars-preview__body .hljs-comment,
+.lcars-preview__body .hljs-quote {
+  color: #8a857c;
+  font-style: italic;
+}
+.lcars-preview__body .hljs-keyword,
+.lcars-preview__body .hljs-selector-tag,
+.lcars-preview__body .hljs-meta {
+  color: #8a3a3a;
+  font-weight: 600;
+}
+.lcars-preview__body .hljs-string,
+.lcars-preview__body .hljs-attr,
+.lcars-preview__body .hljs-template-tag,
+.lcars-preview__body .hljs-template-variable {
+  color: #2c5d8a;
+}
+.lcars-preview__body .hljs-number,
+.lcars-preview__body .hljs-literal,
+.lcars-preview__body .hljs-built_in {
+  color: #76542c;
+}
+.lcars-preview__body .hljs-title,
+.lcars-preview__body .hljs-name,
+.lcars-preview__body .hljs-section,
+.lcars-preview__body .hljs-function .hljs-title {
+  color: #5b3a76;
+  font-weight: 600;
+}
+.lcars-preview__body .hljs-variable,
+.lcars-preview__body .hljs-params {
+  color: #3d3a35;
+}
+.lcars-preview__body .hljs-tag,
+.lcars-preview__body .hljs-symbol {
+  color: #76542c;
+}
+
+/* ----------------------------------------------------------
+   Markdown help modal — reference cheatsheet
+   ---------------------------------------------------------- */
+
+.lcars-help__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lcars-help__section-title {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lcars-peach);
+  font-weight: 400;
+}
+.lcars-help__rows {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 1fr;
+  column-gap: 18px;
+  row-gap: 4px;
+}
+.lcars-help__row {
+  display: contents;
+}
+.lcars-help__syntax {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--lcars-orange);
+}
+.lcars-help__result {
+  margin: 0;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 14px;
+  color: var(--lcars-text-body);
+}
+
+/* ----------------------------------------------------------
+   Find / Replace overlay — sits at the top of the stage
+   ---------------------------------------------------------- */
+
+.lcars-find {
+  position: absolute;
+  top: 12px;
+  right: 28px;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--lcars-orange);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: "Antonio", Impact, sans-serif;
+  min-width: 360px;
+}
+.lcars-find__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lcars-find__label {
+  width: 60px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lcars-orange);
+  opacity: 0.85;
+}
+.lcars-find__input {
+  flex: 1 1 auto;
+  appearance: none;
+  background: rgba(255, 153, 51, 0.08);
+  border: 1px solid rgba(255, 153, 51, 0.4);
+  border-radius: 4px;
+  color: var(--lcars-text-body);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  padding: 4px 8px;
+  outline: 0;
+}
+.lcars-find__input:focus {
+  border-color: var(--lcars-orange);
+  background: rgba(255, 153, 51, 0.14);
+}
+.lcars-find__count {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--lcars-text-body);
+  opacity: 0.7;
+  min-width: 80px;
+  text-align: right;
+}
+.lcars-find__btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--lcars-orange);
+  color: var(--lcars-orange);
+  font-family: "Antonio", Impact, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.lcars-find__btn:hover:not(:disabled) {
+  background: var(--lcars-orange);
+  color: var(--lcars-bg);
+}
+.lcars-find__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.lcars-find__btn--close {
+  border: 0;
+  color: var(--lcars-text-body);
+  padding: 0 8px;
+  font-size: 14px;
+}
+.lcars-find__btn--close:hover {
+  background: transparent;
+  color: var(--lcars-red);
 }
