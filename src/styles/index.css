@@ -1073,28 +1073,67 @@ body,
 .lcars-preview__body h1,
 .lcars-preview__body h2,
 .lcars-preview__body h3,
-.lcars-preview__body h4 {
-  font-weight: 600;
-  line-height: 1.25;
-  margin-top: 1.5em;
-  margin-bottom: 0.4em;
+.lcars-preview__body h4,
+.lcars-preview__body h5,
+.lcars-preview__body h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 1.6em;
+  margin-bottom: 0.45em;
+  color: #15110b;
 }
 .lcars-preview__body h1 {
-  font-size: 30px;
+  font-size: 38px;
+  border-bottom: 1px solid #d4cdba;
+  padding-bottom: 0.2em;
 }
 .lcars-preview__body h2 {
-  font-size: 25px;
+  font-size: 30px;
+  border-bottom: 1px solid #ebe7dc;
+  padding-bottom: 0.18em;
 }
 .lcars-preview__body h3 {
-  font-size: 21px;
+  font-size: 24px;
 }
 .lcars-preview__body h4 {
+  font-size: 20px;
+}
+.lcars-preview__body h5 {
   font-size: 18px;
+}
+.lcars-preview__body h6 {
+  font-size: 16px;
+  color: #6e6a63;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.lcars-preview__body p {
+  margin: 0;
+}
+.lcars-preview__body strong {
+  font-weight: 700;
+  color: #15110b;
+}
+.lcars-preview__body em {
+  font-style: italic;
+}
+.lcars-preview__body del {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  color: #6e6a63;
+}
+.lcars-preview__body mark {
+  background: #fff2a8;
+  padding: 0 2px;
+  border-radius: 2px;
 }
 .lcars-preview__body a {
   color: #2c5d8a;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+.lcars-preview__body a:hover {
+  color: #1f456a;
 }
 .lcars-preview__body code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1102,6 +1141,15 @@ body,
   background: #ebe7dc;
   padding: 1px 5px;
   border-radius: 3px;
+}
+.lcars-preview__body kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: #fff;
+  border: 1px solid #c9c2b3;
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  padding: 1px 6px;
 }
 .lcars-preview__body pre {
   background: #ebe7dc;
@@ -1123,12 +1171,28 @@ body,
   color: #4a4641;
   font-style: italic;
 }
+.lcars-preview__body blockquote > * + * {
+  margin-top: 0.6em;
+}
 .lcars-preview__body ul,
 .lcars-preview__body ol {
   padding-left: 28px;
+  margin: 0;
+}
+.lcars-preview__body li {
+  margin: 0;
 }
 .lcars-preview__body li + li {
   margin-top: 6px;
+}
+.lcars-preview__body li > ul,
+.lcars-preview__body li > ol {
+  margin-top: 6px;
+}
+.lcars-preview__body li > input[type="checkbox"] {
+  margin-right: 6px;
+  transform: translateY(1px);
+  accent-color: #2c5d8a;
 }
 .lcars-preview__body hr {
   border: 0;
@@ -1151,5 +1215,5 @@ body,
 }
 .lcars-preview__body th {
   background: #ebe7dc;
-  font-weight: 600;
+  font-weight: 700;
 }
