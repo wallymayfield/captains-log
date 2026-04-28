@@ -9,9 +9,10 @@ import * as THREE from "three";
  * Coordinate convention: +z = forward (bow), +y = up, +x = starboard.
  *
  * Built to match the canonical silhouette: a dominant lens-shaped
- * saucer at the front, a chubby egg-shaped engineering hull tucked
- * behind and below the saucer, two short pylons sweeping up-and-out
- * to closely-spaced nacelles that ride level with the saucer.
+ * saucer at the front; an egg-shaped engineering hull tucked behind
+ * and below the saucer; nacelles riding BELOW the saucer plane,
+ * connected to the engineering hull via short curved pylons that
+ * emerge from the sides of the secondary hull.
  */
 
 const HULL_COLOR = "#FF9933";
@@ -20,7 +21,6 @@ const COIL_COLOR = "#6699CC";
 const BUSSARD_COLOR = "#CC6666";
 
 // ---------- Saucer profile (lathed around Y) ----------
-// Thin lens — dome on top, shallow concave underneath.
 const SAUCER_PROFILE = [
   new THREE.Vector2(0.001, -0.16),
   new THREE.Vector2(0.5, -0.2),
@@ -34,12 +34,11 @@ const SAUCER_PROFILE = [
   new THREE.Vector2(0.001, 0.22),
 ];
 
-// ---------- Engineering hull profile (lathed around Y, rotated) ----------
-// Egg-shape: rounded blunt nose at the front (where the deflector
-// dish sits), tapering to a flat back face. Lathe is rotated -π/2
-// around X so the long axis points along scene's +z (bow).
+// ---------- Engineering hull profile (lathed around Y, rotated +π/2 around X) ----------
+// Profile y=+1 is the rounded nose; y=-1 is the flat back face. After
+// rotation, +y of the lathe becomes +z of the scene (bow direction).
 const ENGINEERING_PROFILE = [
-  new THREE.Vector2(0.001, -1.0), // back face
+  new THREE.Vector2(0.001, -1.0),
   new THREE.Vector2(0.42, -1.0),
   new THREE.Vector2(0.45, -0.8),
   new THREE.Vector2(0.5, -0.4),
@@ -47,8 +46,19 @@ const ENGINEERING_PROFILE = [
   new THREE.Vector2(0.45, 0.6),
   new THREE.Vector2(0.32, 0.85),
   new THREE.Vector2(0.18, 0.97),
-  new THREE.Vector2(0.001, 1.0), // rounded nose tip
+  new THREE.Vector2(0.001, 1.0),
 ];
+
+// ---------- Pylon cross-section (extruded along a 3D curve) ----------
+const PYLON_CROSS_SECTION = (() => {
+  const s = new THREE.Shape();
+  s.moveTo(-0.04, -0.18);
+  s.lineTo(0.04, -0.18);
+  s.lineTo(0.04, 0.18);
+  s.lineTo(-0.04, 0.18);
+  s.lineTo(-0.04, -0.18);
+  return s;
+})();
 
 type EmissivePulseProps = {
   color: string;
@@ -97,11 +107,35 @@ function Hull({
   );
 }
 
-// Concentric deflector dish: amber outer ring + red glowing center.
+// Curved pylon: cross-section swept along a CatmullRomCurve3 from
+// the side of the engineering hull (mid-height) up and outward to
+// the nacelle bottom. Mirrored across X for the opposing side.
+function CurvedPylon({ side }: { side: number }) {
+  const geo = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.42, -0.6, -1.6),
+      new THREE.Vector3(side * 0.62, -0.5, -1.7),
+      new THREE.Vector3(side * 0.85, -0.35, -1.7),
+      new THREE.Vector3(side * 1.05, -0.28, -1.6),
+    ]);
+    return new THREE.ExtrudeGeometry(PYLON_CROSS_SECTION, {
+      steps: 32,
+      bevelEnabled: false,
+      extrudePath: curve,
+    });
+  }, [side]);
+
+  return (
+    <mesh geometry={geo}>
+      <Hull />
+    </mesh>
+  );
+}
+
+// Concentric deflector dish — blue outer / amber middle / red center.
 function Deflector({ position }: { position: [number, number, number] }) {
   return (
-    <group position={position} rotation={[0, Math.PI, 0]}>
-      {/* Outer rim */}
+    <group position={position}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.18, 0.28, 40]} />
         <meshBasicMaterial
@@ -111,7 +145,6 @@ function Deflector({ position }: { position: [number, number, number] }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      {/* Amber middle ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.005]}>
         <ringGeometry args={[0.08, 0.18, 40]} />
         <meshBasicMaterial
@@ -121,7 +154,6 @@ function Deflector({ position }: { position: [number, number, number] }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      {/* Red hot center */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.01]}>
         <circleGeometry args={[0.08, 32]} />
         <EmissivePulse
@@ -155,13 +187,13 @@ export function Ship() {
           <Hull threshold={10} />
         </mesh>
 
-        {/* Subtle deck-line ring at the rim equator */}
+        {/* Single subtle deck-line ring at the rim equator */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[2.36, 0.012, 6, 80]} />
           <meshBasicMaterial color={ACCENT_COLOR} />
         </mesh>
 
-        {/* Bridge module — small low dome dead-center on top */}
+        {/* Bridge module — small low dome on top, dead center */}
         <mesh position={[0, 0.22, 0]}>
           <cylinderGeometry args={[0.09, 0.12, 0.04, 24, 1]} />
           <Hull />
@@ -194,9 +226,7 @@ export function Ship() {
       </group>
 
       {/* ============================================================
-          NECK — short, slightly forward-leaning slab.
-          Top sits flush under the saucer rear; bottom flush on the
-          engineering hull dorsal forward face.
+          NECK — short slab connecting saucer underside to engineering top.
           ============================================================ */}
       <mesh
         position={[0, -0.05, -0.85]}
@@ -207,50 +237,39 @@ export function Ship() {
       </mesh>
 
       {/* ============================================================
-          ENGINEERING HULL (secondary hull) — egg-shape lathed and
-          rotated so the long axis runs along z. Front faces +z.
+          ENGINEERING HULL (secondary hull) — egg shape, nose forward.
           ============================================================ */}
       <group position={[0, -0.6, -1.6]}>
         <mesh
           geometry={engineeringGeo}
-          rotation={[-Math.PI / 2, 0, 0]}
+          rotation={[Math.PI / 2, 0, 0]}
           scale={[0.85, 1, 0.7]}
         >
           <Hull threshold={8} />
         </mesh>
-
-        {/* Deflector dish — concentric rings on the front face */}
+        {/* Deflector at the front face (z = +1 in engineering's local) */}
         <Deflector position={[0, 0, 0.95]} />
       </group>
 
       {/* ============================================================
-          PYLONS + NACELLES — short pylons sweep up-and-outward at
-          ~50° from vertical; nacelles ride level with the saucer.
+          PYLONS + NACELLES — pylons emerge from engineering sides as
+          short curved arcs to nacelles riding BELOW the saucer.
           ============================================================ */}
       {[1, -1].map((side) => (
         <group key={`nac-${side}`}>
-          {/* Pylon — flat slab from engineering top to nacelle bottom.
-              Length 0.95, rotated -50° around Z (port mirrors). */}
-          <mesh
-            position={[side * 0.62, -0.14, -1.6]}
-            rotation={[0, 0, side * -0.87]}
-          >
-            <boxGeometry args={[0.1, 0.95, 0.4]} />
-            <Hull />
-          </mesh>
+          <CurvedPylon side={side} />
 
-          {/* Nacelle main body — long slender cylinder.
-              x = ±1.1 (close to centerline, matches references). */}
+          {/* Nacelle body — long slender cigar, BELOW saucer plane */}
           <mesh
-            position={[side * 1.1, 0.45, -1.6]}
+            position={[side * 1.05, -0.1, -1.6]}
             scale={[0.18, 0.18, 1.7]}
           >
             <sphereGeometry args={[1, 28, 18]} />
             <Hull threshold={8} />
           </mesh>
 
-          {/* Bussard collector — prominent red dome at the front */}
-          <mesh position={[side * 1.1, 0.45, 0.18]}>
+          {/* Bussard collector — prominent red dome at the FRONT */}
+          <mesh position={[side * 1.05, -0.1, 0.18]}>
             <sphereGeometry args={[0.22, 24, 18]} />
             <EmissivePulse
               color={BUSSARD_COLOR}
@@ -261,7 +280,7 @@ export function Ship() {
           </mesh>
 
           {/* Warp coil grille — continuous emissive blue strip on TOP */}
-          <mesh position={[side * 1.1, 0.62, -1.6]}>
+          <mesh position={[side * 1.05, 0.07, -1.6]}>
             <boxGeometry args={[0.18, 0.05, 2.6]} />
             <EmissivePulse
               color={COIL_COLOR}
@@ -271,8 +290,8 @@ export function Ship() {
             />
           </mesh>
 
-          {/* Aft cap — simple small dome */}
-          <mesh position={[side * 1.1, 0.45, -3.4]}>
+          {/* Aft cap — small simple dome */}
+          <mesh position={[side * 1.05, -0.1, -3.4]}>
             <sphereGeometry
               args={[0.18, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2]}
             />
