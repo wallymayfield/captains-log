@@ -880,8 +880,8 @@ body,
   pointer-events: none;
   background: radial-gradient(
     ellipse at center,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0) 60%
+    rgba(102, 153, 204, 0.7) 0%,
+    rgba(102, 153, 204, 0) 60%
   );
   opacity: 0;
   transition: opacity 180ms ease-out;
