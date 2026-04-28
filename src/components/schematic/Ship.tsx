@@ -149,15 +149,13 @@ function Pylon({ side }: { side: number }) {
 }
 
 // Concentric deflector dish — blue outer / amber middle / red center.
-// Group is rotated π around Y so the rings face the engineering hull's
-// nose direction (forward through the bow) instead of the rear. Inner
-// glow now sits closest to the front so the dish reads as a bulging
-// forward-facing emitter. All materials double-sided.
+// Sized to fit inside the engineering hull's elliptical cross-section
+// at its mounting depth so the rings don't poke through the surface.
 function Deflector({ position }: { position: [number, number, number] }) {
   return (
     <group position={position} rotation={[0, Math.PI, 0]}>
       <mesh>
-        <ringGeometry args={[0.18, 0.28, 48]} />
+        <ringGeometry args={[0.15, 0.22, 48]} />
         <meshBasicMaterial
           color={COIL_COLOR}
           transparent
@@ -166,7 +164,7 @@ function Deflector({ position }: { position: [number, number, number] }) {
         />
       </mesh>
       <mesh position={[0, 0, 0.01]}>
-        <ringGeometry args={[0.09, 0.18, 48]} />
+        <ringGeometry args={[0.07, 0.15, 48]} />
         <meshBasicMaterial
           color={ACCENT_COLOR}
           transparent
@@ -175,7 +173,7 @@ function Deflector({ position }: { position: [number, number, number] }) {
         />
       </mesh>
       <mesh position={[0, 0, 0.02]}>
-        <circleGeometry args={[0.09, 32]} />
+        <circleGeometry args={[0.07, 32]} />
         <meshStandardMaterial
           color={BUSSARD_COLOR}
           emissive={BUSSARD_COLOR}
@@ -239,6 +237,40 @@ export function Ship() {
           <torusGeometry args={[1.7, 0.005, 6, 64]} />
           <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.3} />
         </mesh>
+
+        {/* Two extra concentric rings on the upper hull, between
+            the existing ones, for denser linework. */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.08, 0]}>
+          <torusGeometry args={[2.18, 0.004, 6, 80]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.4} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.12, 0]}>
+          <torusGeometry args={[1.72, 0.004, 6, 72]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.35} />
+        </mesh>
+
+        {/* Radial sector lines — eight thin spokes from inside the
+            bridge area outward to the rim. Reads as the saucer's
+            sector divisions. */}
+        {Array.from({ length: 8 }, (_, i) => {
+          const angle = (i / 8) * Math.PI * 2;
+          return (
+            <group
+              key={`spoke-${i}`}
+              rotation={[0, angle, 0]}
+              position={[0, 0.075, 0]}
+            >
+              <mesh position={[1.05, 0, 0]}>
+                <boxGeometry args={[1.85, 0.004, 0.008]} />
+                <meshBasicMaterial
+                  color={HULL_COLOR}
+                  transparent
+                  opacity={0.32}
+                />
+              </mesh>
+            </group>
+          );
+        })}
         {/* Bridge module — small low dome dead-center on top */}
         <mesh position={[0, 0.22, 0]}>
           <cylinderGeometry args={[0.09, 0.12, 0.04, 24, 1]} />
@@ -284,11 +316,11 @@ export function Ship() {
           <Hull threshold={8} />
         </mesh>
 
-        {/* Deflector recessed into the hull's nose at engineering
-            local z=0.95 (world z≈-0.45) — the hull has enough radius
-            here for the larger rings while still reading as a forward
-            feature. */}
-        <Deflector position={[0, 0.0, 0.95]} />
+        {/* Deflector mounted deeper into the hull (engineering local
+            z=0.85, world z≈-0.55) where the elliptical cross-section
+            has enough Y-radius (~0.29) for the rings to sit fully
+            inside without poking through the top or bottom. */}
+        <Deflector position={[0, 0.0, 0.85]} />
       </group>
 
       {/* Dorsal fin — rises from engineering top to saucer underside.
