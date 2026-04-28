@@ -128,17 +128,17 @@ function Hull({
 }
 
 // Curved pylon: cross-section swept along a CatmullRomCurve3 from
-// the engineering hull's lower-side outward to the nacelle bottom.
-// The last two control points share z with the end point so the
-// tangent at the nacelle attachment lies in the XY plane — the
-// cross-section orients cleanly perpendicular to the nacelle axis
-// rather than twisting at the join.
+// the engineering hull's BACK-BOTTOM-SIDE forward, outward, and up
+// to the nacelle bottom (mid-nacelle). The last two control points
+// share z with the end point so the tangent at the nacelle
+// attachment lies in the XY plane — the cross-section orients
+// cleanly perpendicular to the nacelle axis.
 function CurvedPylon({ side }: { side: number }) {
   const geo = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.36, -0.78, -1.4),
-      new THREE.Vector3(side * 0.6, -0.62, -1.5),
-      new THREE.Vector3(side * 0.9, -0.32, -1.4),
+      new THREE.Vector3(side * 0.34, -0.85, -1.95),
+      new THREE.Vector3(side * 0.55, -0.7, -1.7),
+      new THREE.Vector3(side * 0.85, -0.4, -1.4),
       new THREE.Vector3(side * 1.05, -0.13, -1.4),
     ]);
     return new THREE.ExtrudeGeometry(PYLON_CROSS_SECTION, {
@@ -156,29 +156,32 @@ function CurvedPylon({ side }: { side: number }) {
 }
 
 // Concentric deflector dish — blue outer / amber middle / red center.
+// Rings sit in the XY plane with normals pointing forward (+Z), set
+// into the engineering hull's nose so they read as part of the front
+// surface rather than a flat tab sticking out.
 function Deflector({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.18, 0.28, 40]} />
+      <mesh>
+        <ringGeometry args={[0.11, 0.17, 40]} />
         <meshBasicMaterial
           color={COIL_COLOR}
           transparent
-          opacity={0.55}
+          opacity={0.65}
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.005]}>
-        <ringGeometry args={[0.08, 0.18, 40]} />
+      <mesh position={[0, 0, 0.006]}>
+        <ringGeometry args={[0.05, 0.11, 40]} />
         <meshBasicMaterial
           color={ACCENT_COLOR}
           transparent
-          opacity={0.85}
+          opacity={0.9}
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.01]}>
-        <circleGeometry args={[0.08, 32]} />
+      <mesh position={[0, 0, 0.012]}>
+        <circleGeometry args={[0.05, 32]} />
         <EmissivePulse
           color={BUSSARD_COLOR}
           base={1.6}
@@ -258,8 +261,11 @@ export function Ship() {
           <Hull threshold={8} />
         </mesh>
 
-        {/* Deflector at the front face (z = +1 in engineering's local) */}
-        <Deflector position={[0, 0.0, 1.1]} />
+        {/* Deflector recessed into the hull's nose — positioned at
+            engineering local z=0.88 (world z≈-0.52) where the hull
+            has enough radius for the rings to read clearly without
+            poking through the surface. */}
+        <Deflector position={[0, 0.0, 0.88]} />
       </group>
 
       {/* Dorsal fin — rises from engineering top to saucer underside.
