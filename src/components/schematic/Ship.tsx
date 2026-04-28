@@ -249,30 +249,6 @@ export function Ship() {
           <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.35} />
         </mesh>
 
-        {/* Radial sector lines — sixteen spokes on each face
-            (top + bottom) running from near the saucer center
-            all the way to the outer rim. */}
-        {[0.075, -0.075].map((spokeY) =>
-          Array.from({ length: 16 }, (_, i) => {
-            const angle = (i / 16) * Math.PI * 2;
-            return (
-              <group
-                key={`spoke-${spokeY}-${i}`}
-                rotation={[0, angle, 0]}
-                position={[0, spokeY, 0]}
-              >
-                <mesh position={[1.25, 0, 0]}>
-                  <boxGeometry args={[2.3, 0.006, 0.012]} />
-                  <meshBasicMaterial
-                    color={HULL_COLOR}
-                    transparent
-                    opacity={0.55}
-                  />
-                </mesh>
-              </group>
-            );
-          }),
-        )}
         {/* Bridge module — small low dome dead-center on top */}
         <mesh position={[0, 0.22, 0]}>
           <cylinderGeometry args={[0.09, 0.12, 0.04, 24, 1]} />
