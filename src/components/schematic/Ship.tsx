@@ -117,13 +117,14 @@ function Hull({
   );
 }
 
-// Pylon: a simple straight slab from engineering hull's
-// back-bottom-side to the nacelle bottom. Single rotated box —
-// avoids the Frenet-frame twisting issues of a curved extrusion.
+// Pylon: a simple cylinder from inside the engineering hull's
+// back-bottom-side to inside the nacelle bottom. Round cross-section
+// avoids any roll-orientation issues and embeds cleanly into the
+// curved hull and nacelle surfaces.
 function Pylon({ side }: { side: number }) {
   const { position, rotation, length } = useMemo(() => {
-    const start = new THREE.Vector3(side * 0.36, -0.82, -1.9);
-    const end = new THREE.Vector3(side * 1.05, -0.05, -1.4);
+    const start = new THREE.Vector3(side * 0.28, -0.78, -1.85);
+    const end = new THREE.Vector3(side * 1.02, 0.0, -1.4);
     const mid = start.clone().add(end).multiplyScalar(0.5);
     const len = start.distanceTo(end);
     const dir = end.clone().sub(start).normalize();
@@ -141,21 +142,22 @@ function Pylon({ side }: { side: number }) {
 
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[0.1, length, 0.32]} />
+      <cylinderGeometry args={[0.085, 0.085, length, 16]} />
       <Hull />
     </mesh>
   );
 }
 
 // Concentric deflector dish — blue outer / amber middle / red center.
-// Bigger and inverted layering so the inner glow sits DEEPEST and the
-// outer ring is at the surface — gives a recessed-bowl read instead
-// of a bulge. All materials double-sided.
+// Group is rotated π around Y so the rings face the engineering hull's
+// nose direction (forward through the bow) instead of the rear. Inner
+// glow now sits closest to the front so the dish reads as a bulging
+// forward-facing emitter. All materials double-sided.
 function Deflector({ position }: { position: [number, number, number] }) {
   return (
-    <group position={position}>
+    <group position={position} rotation={[0, Math.PI, 0]}>
       <mesh>
-        <ringGeometry args={[0.16, 0.24, 40]} />
+        <ringGeometry args={[0.18, 0.28, 48]} />
         <meshBasicMaterial
           color={COIL_COLOR}
           transparent
@@ -163,8 +165,8 @@ function Deflector({ position }: { position: [number, number, number] }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[0, 0, -0.008]}>
-        <ringGeometry args={[0.08, 0.16, 40]} />
+      <mesh position={[0, 0, 0.01]}>
+        <ringGeometry args={[0.09, 0.18, 48]} />
         <meshBasicMaterial
           color={ACCENT_COLOR}
           transparent
@@ -172,12 +174,12 @@ function Deflector({ position }: { position: [number, number, number] }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[0, 0, -0.016]}>
-        <circleGeometry args={[0.08, 32]} />
+      <mesh position={[0, 0, 0.02]}>
+        <circleGeometry args={[0.09, 32]} />
         <meshStandardMaterial
           color={BUSSARD_COLOR}
           emissive={BUSSARD_COLOR}
-          emissiveIntensity={1.6}
+          emissiveIntensity={1.7}
           roughness={0.4}
           side={THREE.DoubleSide}
         />
@@ -205,9 +207,37 @@ export function Ship() {
         <mesh geometry={saucerGeo}>
           <Hull threshold={10} />
         </mesh>
+        {/* Phaser strip along the rim (top) */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[2.36, 0.012, 6, 80]} />
           <meshBasicMaterial color={ACCENT_COLOR} />
+        </mesh>
+        {/* Phaser strip along the rim (bottom) */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.04, 0]}>
+          <torusGeometry args={[2.32, 0.008, 6, 80]} />
+          <meshBasicMaterial color={ACCENT_COLOR} transparent opacity={0.6} />
+        </mesh>
+        {/* Concentric deck-line rings on the upper hull */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.06, 0]}>
+          <torusGeometry args={[1.95, 0.005, 6, 80]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.45} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.10, 0]}>
+          <torusGeometry args={[1.5, 0.005, 6, 64]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.4} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.14, 0]}>
+          <torusGeometry args={[1.0, 0.005, 6, 56]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.35} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.17, 0]}>
+          <torusGeometry args={[0.55, 0.004, 6, 48]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.3} />
+        </mesh>
+        {/* Underside deck-line ring */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.08, 0]}>
+          <torusGeometry args={[1.7, 0.005, 6, 64]} />
+          <meshBasicMaterial color={HULL_COLOR} transparent opacity={0.3} />
         </mesh>
         {/* Bridge module — small low dome dead-center on top */}
         <mesh position={[0, 0.22, 0]}>
