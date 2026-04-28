@@ -40,9 +40,16 @@ export function LeftRail({
   onOpenSettings,
   onOpenHelp,
 }: LeftRailProps) {
+  const onSchematic = route === "schematic";
+  const showsWrite = onSchematic || viewMode === "preview";
+
   const togglePreview = () => {
+    if (onSchematic) {
+      if (viewMode === "preview") onToggleViewMode();
+      navigate("editor");
+      return;
+    }
     onToggleViewMode();
-    if (route === "schematic") navigate("editor");
   };
   return (
     <div className="lcars-rail" role="navigation" aria-label="Primary">
@@ -53,12 +60,10 @@ export function LeftRail({
       <Bar color="pink" grow showId={false} />
       <Bar label={status} color={STATUS_COLOR[status]} />
       <Bar
-        label={viewMode === "preview" ? "WRITE" : "PREVIEW"}
-        color={viewMode === "preview" ? "orange" : "peach"}
+        label={showsWrite ? "WRITE" : "PREVIEW"}
+        color={showsWrite ? "orange" : "peach"}
         onClick={togglePreview}
-        ariaLabel={
-          viewMode === "preview" ? "Back to editor" : "Show markdown preview"
-        }
+        ariaLabel={showsWrite ? "Back to editor" : "Show markdown preview"}
       />
       <Bar label="HELP" color="tan" onClick={onOpenHelp} />
       <Bar label="SETTINGS" color="violet" onClick={onOpenSettings} />
