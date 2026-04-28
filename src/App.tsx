@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Elbow } from "@/components/primitives";
@@ -6,7 +6,6 @@ import { LeftRail, type Status, type ViewMode } from "@/components/LeftRail";
 import { TopBar } from "@/components/TopBar";
 import { BottomBar } from "@/components/BottomBar";
 import { CenterStage } from "@/components/CenterStage";
-import { Schematic } from "@/components/Schematic";
 import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { ErrorBanner } from "@/components/ErrorBanner";
@@ -33,6 +32,8 @@ import {
   startRedAlert,
   stopRedAlert,
 } from "@/lib/sound";
+
+const Schematic = lazy(() => import("@/components/Schematic"));
 
 const DISCARD_PROMPT =
   "You have unsaved changes. Discard them and continue?";
@@ -211,7 +212,9 @@ export function App() {
 
   const stageContent =
     route === "schematic" ? (
-      <Schematic />
+      <Suspense fallback={null}>
+        <Schematic />
+      </Suspense>
     ) : viewMode === "preview" ? (
       <Preview doc={doc} />
     ) : (

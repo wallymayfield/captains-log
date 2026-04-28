@@ -7,7 +7,7 @@ import { formatStardate } from "@/lib/stardate";
 
 const STAR_COUNT = 90;
 
-export function Schematic() {
+export default function Schematic() {
   const now = useTicker(60_000);
 
   const stars = useMemo(
