@@ -17,7 +17,6 @@ Thumbs.db
 
 # Rust / Tauri
 src-tauri/target
-src-tauri/Cargo.lock
 src-tauri/gen
 
 # Coverage / cache
